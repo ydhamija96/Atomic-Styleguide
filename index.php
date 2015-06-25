@@ -14,14 +14,10 @@ function findDir($url, $currentDir){
 			$currentDir[substr($content, 0, -1)] = findDir($url . $content, $currentDir);
 		}
 		else{
-			$currentDir[$content] = returnFileContents($url.$content);
+			$currentDir[$content] = file_get_contents($url.$content);
 		}
 	}
 	return $currentDir;
-}
-
-function returnFileCOntents($url){
-	return $url;
 }
 
 $directoryListing = findDir($url, $directoryListing);
