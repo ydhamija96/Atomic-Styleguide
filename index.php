@@ -9,14 +9,13 @@ class BitBucketRepo{
 	function __construct($url){
 		$this->parentURL = $url;
 		$this->directoryListing = $this->getAllContents($this->parentURL, $this->directoryListing);
-		print_r($this->directoryListing);
 	}
 	private function getAllContents($url, $currentDir){
 		$returnValue = file_get_contents($url);
 		$contents = explode("\n", $returnValue);
 		foreach($contents as $content){
 			if(substr($content, -1) == '/'){
-				$currentDir[substr($content, 0, -1)] = getAllContents($url . $content, $currentDir);
+				$currentDir[substr($content, 0, -1)] = $this->getAllContents($url . $content, $currentDir);
 			}
 			else{
 				$currentDir[$content] = $url.$content;
@@ -27,7 +26,7 @@ class BitBucketRepo{
 	private function inListing($dirs) {
 		$listing = $this->directoryListing;
 		foreach ($dirs as $dir) {
-			if (array_key_exists($dir, $listing)) {
+			if (array_key_exists($dir, $listing) && is_array($listing[$dir])) {
 				$listing = $listing[$dir];
 			}
 			else{
@@ -61,14 +60,28 @@ class BitBucketRepo{
 		}
 		if(!$this->inListing($this->currentLoc)){
 			$this->currentLoc = $oldLoc;
-			echo "<hr>No such directory.";
 		}
 		return $this;
+	}
+	public function ls(){
+		$listing = $this->directoryListing;
+		$result = array();
+		foreach ($this->currentLoc as $dir) {
+			$listing = $listing[$dir];
+		}
+		foreach($listing as $key => $item){
+			if(is_array($item)){
+				$result[] = $key.'/';
+			}
+			else{
+				$result[] = $key;
+			}
+		}
+		return $result;
 	}
 }
 
 echo "<pre>";
 $repo = new BitBucketRepo('https://bitbucket.org/api/1.0/repositories/ydhamija96/nyu-bitbucket-design-nav/raw/master/CONTENTS/');
-$repo->cd('/components/section_1/');
-
+print_r($repo->ls());
 ?>
