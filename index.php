@@ -7,23 +7,25 @@ $url = 'https://bitbucket.org/api/1.0/repositories/ydhamija96/nyu-bitbucket-desi
 
 
 function findDir($url, $currentDir){
-	$returnValue = file_get_contents($url);		// = "CONTENT/ index.php"
-	$contents = explode("\n", $returnValue);	// = ["CONTENT/", "index.php"]
+	$returnValue = file_get_contents($url);
+	$contents = explode("\n", $returnValue);
 	foreach($contents as $content){
-		if($content[ count($content)-1 ] == '/'){	//Is a directory
-			echo "DIR";
-			$currentDir[$content] = findDir($url . $content, $currentDir[$content]);	// = ['CONTENT/' => [...], ...]
+		if(substr($content, -1) == '/'){
+			$currentDir[substr($content, 0, -1)] = findDir($url . $content, $currentDir);
 		}
-		else{	//Is a file
-			$currentDir['FILE'] = $content;
+		else{
+			$currentDir[$content] = returnFileContents($url.$content);
 		}
 	}
 	return $currentDir;
 }
 
-findDir($url, $directoryListing);
+function returnFileCOntents($url){
+	return $url;
+}
 
-echo "<pre>";
-print_r($directoryListing);
+$directoryListing = findDir($url, $directoryListing);
+
+echo $directoryListing["CONTENTS"]["test.html"];
 
 ?>
