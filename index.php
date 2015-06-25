@@ -160,18 +160,7 @@ class BitBucketRepo{
 		    ?>
 	      </ul>
 	      <ul class="nav navbar-nav navbar-right">
-	      	<?php
-	      		if($repo->pwd() == '/'){
-					$link = '?';
-				}
-				else{
-					$oldPath = $repo->pwd();
-					$link = urlencode($repo->cd('..')->pwd());
-					$link = "?path=".$link;
-					$repo->cd($oldPath);
-				}
-	      	?>
-            <li class="active"><a>Current: <?= $repo->pwd() ?></a></li>
+            <li class="active"><a>Current Path: <?= $repo->pwd() ?></a></li>
           </ul>
 	    </div>
 	  </div>
