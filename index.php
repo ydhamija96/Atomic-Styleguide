@@ -79,9 +79,29 @@ class BitBucketRepo{
 		}
 		return $result;
 	}
+	public function contents($path){
+		if($path[0] == '/'){
+			return file_get_contents($this->parentURL . substr($path, 1));
+		}
+		else{
+			return file_get_contents($this->parentURL . implode('/', $this->currentLoc) . '/' . $path);
+		}
+	}
 }
 
-echo "<pre>";
-$repo = new BitBucketRepo('https://bitbucket.org/api/1.0/repositories/ydhamija96/nyu-bitbucket-design-nav/raw/master/CONTENTS/');
-print_r($repo->ls());
 ?>
+
+
+<pre>
+<?php
+	$repo = new BitBucketRepo('https://bitbucket.org/api/1.0/repositories/ydhamija96/nyu-bitbucket-design-nav/raw/master/CONTENTS/');
+	print_r($repo->ls());
+	echo "<hr>";
+	$repo->cd('components/section_1');
+	echo $repo->pwd();
+	echo "<hr>";
+	print_r($repo->ls());
+	echo "<hr>";
+	echo $repo->contents('New Text Document.txt');
+?>
+</pre>
