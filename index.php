@@ -44,7 +44,6 @@ class BitBucketRepo{
 			$this->currentLoc = array();
 			return $this;
 		}
-		$oldLoc = $this->currentLoc;
 		$loc = (strlen($loc) > 1) ? rtrim($loc, '/') : $loc;
 		$loc = explode('/', $loc);
 		if($loc[0] == ''){
@@ -64,7 +63,7 @@ class BitBucketRepo{
 			}
 		}
 		if(!$this->inListing($this->currentLoc)){
-			$this->currentLoc = $oldLoc;
+			$this->cd('..');
 		}
 		return $this;
 	}
@@ -148,7 +147,8 @@ class BitBucketRepo{
 		          <ul class="dropdown-menu">
 		            <?php 
 		            	$repo->cd($dir);
-		            	foreach($repo->ls() as $item):
+		            	$showAll = !(strpos($repo->pwd(), '/components') === 0);
+		            	foreach($repo->ls($showAll) as $item):
 		            		?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
 		            	endforeach;
 		            	$repo->cd('..');
@@ -173,6 +173,9 @@ class BitBucketRepo{
 			}
 			elseif(strpos($repo->pwd(), '/templates') === 0){
 				echo "IN TEMPLATES";
+			}
+			else{
+				echo $repo->pwd();
 			}
 		?>
 	</div>
