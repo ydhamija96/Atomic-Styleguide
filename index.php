@@ -39,6 +39,10 @@ class BitBucketRepo{
 		return '/'.implode('/', $this->currentLoc);
 	}
 	public function cd($loc){
+		if($loc == '/'){
+			$this->currentLoc = array();
+			return $this;
+		}
 		$oldLoc = $this->currentLoc;
 		$loc = (strlen($loc) > 1) ? rtrim($loc, '/') : $loc;
 		$loc = explode('/', $loc);
@@ -63,7 +67,7 @@ class BitBucketRepo{
 		}
 		return $this;
 	}
-	public function ls(){
+	public function ls($all = true){
 		$listing = $this->directoryListing;
 		$result = array();
 		foreach ($this->currentLoc as $dir) {
@@ -73,35 +77,120 @@ class BitBucketRepo{
 			if(is_array($item)){
 				$result[] = $key.'/';
 			}
-			else{
+			elseif($all){
 				$result[] = $key;
 			}
 		}
 		return $result;
 	}
-	public function contents($path){
+	public function link($path){
 		if($path[0] == '/'){
-			return file_get_contents($this->parentURL . substr($path, 1));
+			return ($this->parentURL . substr($path, 1));
 		}
 		else{
-			return file_get_contents($this->parentURL . implode('/', $this->currentLoc) . '/' . $path);
-		}
+			return ($this->parentURL . implode('/', $this->currentLoc) . '/' . $path);
+		}		
+	}
+	public function contents($path){
+		return file_get_contents($this->link($path));
 	}
 }
 
 ?>
 
 
-<pre>
-<?php
-	$repo = new BitBucketRepo('https://bitbucket.org/api/1.0/repositories/ydhamija96/nyu-bitbucket-design-nav/raw/master/CONTENTS/');
-	print_r($repo->ls());
-	echo "<hr>";
-	$repo->cd('components/section_1');
-	echo $repo->pwd();
-	echo "<hr>";
-	print_r($repo->ls());
-	echo "<hr>";
-	echo $repo->contents('New Text Document.txt');
-?>
-</pre>
+<?php session_start(); ?>
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>NYU Atomic Styleguide</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+</head>
+
+<body>
+	<?php
+		if(isset($_SESSION['repo'])){
+			$repo = $_SESSION['repo'];
+		}
+		else{
+			$repo = new BitBucketRepo('https://bitbucket.org/api/1.0/repositories/ydhamija96/nyu-bitbucket-design-nav/raw/master/CONTENTS/');
+		}
+		if(isset($_GET['path'])){
+			$path = urldecode($_GET['path']);
+			$repo->cd($path);
+			echo $path;
+		}else{
+			$repo->cd('/');
+		}
+	?>
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+	  <div class="container">
+	    <div class="navbar-header">
+	      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+	      <a class="navbar-brand" href="?">Style Guide</a>
+	    </div>
+	    <div id="navbar" class="navbar-collapse collapse">
+	      <ul class="nav navbar-nav">
+	      	<?php 
+	      		$oldPath = $repo->pwd();
+	      		$repo->cd('/');
+	      	?>
+	        <?php foreach($repo->ls(false) as $dir): ?>
+        		<li class="dropdown">
+		          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?= ucfirst(rtrim($dir, '/')) ?><span class="caret"></span></a>
+		          <ul class="dropdown-menu">
+		            <?php 
+		            	$repo->cd($dir);
+		            	foreach($repo->ls() as $item):
+		            		?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
+		            	endforeach;
+		            	$repo->cd('..');
+		            ?>
+		          </ul>
+		        </li>
+		    <?php endforeach; ?>
+		    <?php
+		    	$repo->cd($oldPath);
+		    ?>
+	      </ul>
+	      <ul class="nav navbar-nav navbar-right">
+	      	<?php
+	      		if($repo->pwd() == '/'){
+					$link = '?';
+				}
+				else{
+					$oldPath = $repo->pwd();
+					$link = urlencode($repo->cd('..')->pwd());
+					$link = "?path=".$link;
+					$repo->cd($oldPath);
+				}
+	      	?>
+            <li class="active"><a>Current: <?= $repo->pwd() ?></a></li>
+          </ul>
+	    </div>
+	  </div>
+	</nav>
+	<div id="content" style="margin-top:50px">
+		<?php
+			if(strpos($repo->pwd(), '/components') === 0){
+				echo "IN COMPONENTS";
+			}
+			elseif(strpos($repo->pwd(), '/templates') === 0){
+				echo "IN TEMPLATES";
+			}
+		?>
+	</div>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
+</body>
+
+</html>
