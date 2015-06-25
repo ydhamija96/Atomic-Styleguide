@@ -15,7 +15,8 @@ class BitBucketRepo{
 		$contents = explode("\n", $returnValue);
 		foreach($contents as $content){
 			if(substr($content, -1) == '/'){
-				$currentDir[substr($content, 0, -1)] = $this->getAllContents($url . $content, $currentDir);
+				$currentDir[substr($content, 0, -1)] = array();
+				$currentDir[substr($content, 0, -1)] = $this->getAllContents($url . $content, $currentDir[substr($content, 0, -1)]);
 			}
 			else{
 				$currentDir[$content] = $url.$content;
@@ -115,7 +116,7 @@ class BitBucketRepo{
 		}
 		else{
 			$repo = new BitBucketRepo('https://bitbucket.org/api/1.0/repositories/ydhamija96/nyu-bitbucket-design-nav/raw/master/CONTENTS/');
-		}
+		};
 		if(isset($_GET['path'])){
 			$path = urldecode($_GET['path']);
 			$repo->cd($path);
