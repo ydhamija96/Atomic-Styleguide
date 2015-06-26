@@ -170,24 +170,9 @@ class BitBucketRepo{
 				          <ul class="dropdown-menu">
 				            <?php 
 				            	$repo->cd($dir);
-				            	if((strpos($repo->pwd(), '/components') === 0)){
-		                            //foreach($repo->ls(false) as $item):       //Shows only directories
-		                            foreach($repo->ls() as $item):              //Shows everything
-		                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
-		                            endforeach;
-		                        }
-		                        elseif((strpos($repo->pwd(), '/templates') === 0)){
-		                            foreach($repo->ls() as $item):
-		                                //if(!$repo->isDir($item)){                 //Shows only files
-		                                    ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
-		                                //}
-		                            endforeach;                            
-		                        }
-		                        else{
-		                            foreach($repo->ls() as $item):
-		                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
-		                            endforeach;                            
-		                        }
+	                            foreach($repo->ls() as $item):
+	                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
+	                            endforeach;
 				            	$repo->cd('..');
 				            ?>
 				          </ul>
