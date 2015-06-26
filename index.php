@@ -91,7 +91,7 @@ class BitBucketRepo{
 	public function contents($path){
 		return file_get_contents($this->link($path));
 	}
-    public function parentDir(){
+    public function currentDir(){
         return end(array_values($this->currentLoc));
     }
     public function isDir($path){
@@ -105,7 +105,7 @@ class BitBucketRepo{
     	$path = rtrim($path, '/');
     	$oldLocation = $this->pwd();
     	$this->cd($path);
-    	$name = $this->parentDir();
+    	$name = $this->currentDir();
     	if($iter == 0){
     		$date = new DateTime();
 			$timestamp = $date->getTimestamp();
@@ -240,7 +240,7 @@ class BitBucketRepo{
 			    	endforeach;
 			    }
 		    ?>
-            <li><a href="?path=<?= $repo->parentDir() ?>">Go Up <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span></a></li>
+            <li><a href="?path=<?= $repo->currentDir() ?>">Go Up <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span></a></li>
           </ul>
 	      <ul class="nav navbar-nav navbar-right">
 	        <?php
