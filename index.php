@@ -81,7 +81,12 @@ class BitBucketRepo{
 		return $result;
 	}
 	public function link($path){
-		return (rtrim($this->parentURL, '/') . '/' . ((count($this->currentLoc) > 0) ? trim(implode('/', $this->currentLoc), '/') . '/' : '') . ltrim($path, '/'));
+		if($path[0] == '/'){
+			return (rtrim($this->parentURL, '/') . '/' . ltrim($path, '/'));
+		}
+		else{
+			return (rtrim($this->parentURL, '/') . '/' . ((count($this->currentLoc) > 0) ? trim(implode('/', $this->currentLoc), '/') . '/' : '') . ltrim($path, '/'));
+		}
 	}
 	public function contents($path){
 		return file_get_contents($this->link($path));
