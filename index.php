@@ -159,12 +159,16 @@ class BitBucketRepo{
 			$repo = $_SESSION['repo'];
 		}
 		else{
-			$repo = new BitBucketRepo('https://bitbucket.org/api/1.0/repositories/ydhamija96/nyu-bitbucket-design-nav/raw/master/CONTENTS/');
+			$repo = new BitBucketRepo('https://bitbucket.org/api/1.0/repositories/mricotta/nyu/raw/master/');
 		}
-		$repo->cd('/');
-		if(in_array('master.css', $repo->ls()) && !$repo->isDir('master.css')){
-			?><link rel="stylesheet" href="<?= $repo->link('master.css') ?>"><?php
-		}
+    	$repo->cd('/');
+    	foreach($repo->ls() as $file){
+    		if(!$repo->isDir($file)){
+    			if(substr($file, -4) == '.css'){
+    				?><script src="<?= $repo->link($file) ?>"></script><?php
+    			}
+    		}
+    	}
 		if(isset($_GET['path']) && trim($_GET['path']) != ''){
 			$path = urldecode($_GET['path']);
 			$repo->cd($path);
@@ -343,9 +347,13 @@ class BitBucketRepo{
 	</div>
     <?php
     	$repo->cd('/');
-		if(in_array('scripts.js', $repo->ls()) && !$repo->isDir('scripts.js')){
-			?><script src="<?= $repo->link('scripts.js') ?>"></script><?php
-		}
+    	foreach($repo->ls() as $file){
+    		if(!$repo->isDir($file)){
+    			if(substr($file, -3) == '.js'){
+    				?><script src="<?= $repo->link($file) ?>"></script><?php
+    			}
+    		}
+    	}
 	?>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
