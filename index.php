@@ -134,8 +134,11 @@ class BitBucketRepo{
 		}
 	?>
 	<style>
-		body > #content > #singleElement{
-			margin-bottom:25px;
+		body > #content > .singleElement > .options{
+			margin-top:20px;
+		}
+		body > #content > .singleElement{
+			margin-bottom:75px;
 		}
 		body > #content{
 			width:100%;
@@ -143,6 +146,12 @@ class BitBucketRepo{
 			padding:15px;
 			margin:auto;
 			margin-top:75px;
+		}
+		body > #content > .singleElement > .options > .collapse > .well, body > #content > .singleElement > .options > .collapsing > .well{
+			margin-top:5px;
+		}
+		body > #content > .singleElement > .options > .collapse > .well > h3, body > #content > .singleElement > .options > .collapsing > .well > h3{
+			margin-top:-3px;
 		}
 	</style>
 </head>
@@ -227,20 +236,44 @@ class BitBucketRepo{
 		<?php
             if(!$singleFile){
                 if(strpos($repo->pwd(), '/components') === 0){
+                	$counter = 0;
                     foreach($repo->ls() as $item){
                     	if(!$repo->isDir($item)){
-                    		echo '<div id="singleElement">';
+                    		++$counter;
+                    		echo '<div class="singleElement">';
                     			echo $repo->contents($item);
+                    			?>
+                    			<div class="options">
+                    				<button class="btn btn-primary" type="button">Download</button>
+									<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#code<?= $counter ?>" aria-expanded="false" aria-controls="code<?= $counter ?>">
+										Code
+									</button>
+									<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#assets<?= $counter ?>" aria-expanded="false" aria-controls="assets<?= $counter ?>">
+										Assets
+									</button>
+									<div class="collapse" id="code<?= $counter ?>">
+										<div class="well">
+											<h3>Code</h3>
+											<?= htmlspecialchars($repo->contents($item)) ?>
+										</div>
+									</div>
+									<div class="collapse" id="assets<?= $counter ?>">
+										<div class="well">
+											<h3>Assets</h3>
+											<?= '' ?>
+											A list of assets will be placed here. Clickable to download. More information about BitBucket directory structure is required.
+										</div>
+									</div>
+								</div>
+                    			<?php
                     		echo '</div>';
                     	}
                     }
                 }
                 elseif(strpos($repo->pwd(), '/templates') === 0){
-                    foreach($repo->ls() as $item){
-                    	if(!$repo->isDir($item)){
-                    		echo $repo->contents($item);
-                    	}
-                    }
+                    echo "<pre>" . $repo->pwd() . ":<br>";
+                    print_r($repo->ls());
+                    echo "</pre>";
                 }
                 else{
                     echo "<pre>" . $repo->pwd() . ":<br>";
@@ -250,20 +283,29 @@ class BitBucketRepo{
             }
             else{
                 echo $repo->contents($path);
+                ?>
+            		<div class="options">
+            			<button class="btn btn-primary" type="button">Download</button>
+            		</div>
+        		<?php
             }
 		?>
 	</div>
-	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
     <?php
     	$repo->cd('/');
 		if(in_array('scripts.js', $repo->ls()) && !$repo->isDir('scripts.js')){
 			?><script src="<?= $repo->link('scripts.js') ?>"></script><?php
 		}
 	?>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
+    <script>
+		$(function () {
+			$('[data-toggle="popover"]').popover()
+		})
+    </script>
 </body>
 
 </html>
