@@ -101,54 +101,6 @@ class BitBucketRepo{
         $this->cd($old);
         return $result;
     }
-    private function copyToServer($path, $iter = 0){
-    	$path = rtrim($path, '/');
-    	$oldLocation = $this->pwd();
-    	$this->cd($path);
-    	$name = $this->currentDir();
-    	if($iter == 0){
-    		$date = new DateTime();
-			$timestamp = $date->getTimestamp();
-	    	mkdir('files' . $timestamp);
-	    	chdir('files' . $timestamp);
-    		$oldlink = $this->pwd();
-    		$this->cd('/');
-    		foreach($this->ls() as $item){
-    			if(!$this->isDir($item)){
-    				file_put_contents('./'.$item, $this->contents($item));
-    			}
-    		}
-    		$this->cd($oldlink);
-    	}
-    	mkdir($name);
-    	chdir($name);
-    	foreach($this->ls() as $item){
-    		if($this->isDir($item)){
-    			$this->copyToServer($path .'/'. $item, ++$iter);
-    		}
-    		else{
-    			file_put_contents('./'.$item, $this->contents($item));
-    		}
-    	}
-    	chdir('../');
-    	$this->cd($oldLocation);
-    	if($iter==0){
-    		chdir('../');
-    		return $timestamp;
-    	}
-    	else{
-    		return 0;
-    	}
-    }
-
-    public function download($path){
-    	$timestamp = $this->copyToServer($path);
-    	$filename = "files" . $timestamp;
-    	exec("zip -r $filename.zip $filename");
-    	$fp = fopen("$filename.zip","r");
-        //echo fpassthru($fp);
-        //unlink("../$filename");
-    }
 }
 ?>
 
@@ -183,13 +135,17 @@ class BitBucketRepo{
 			$repo->cd('/');
             $singleFile = false;
 		}
-		if(isset($_POST['download']) && isset($_POST['path']) && $_POST['download'] == "TRUE"){
-			$repo->download($_POST['path']);
+		if(isset($_POST['download']) && isset($_POST['downloadpath']) && $_POST['download'] == "TRUE"){
+			$repo->download($_POST['downloadpath']);
 		}
 	?>
 	<style>
 		body > #content > .singleElement > .options{
 			margin-top:20px;
+		}
+		body > #content > .singleElement > .options > form, body > #content > .options > form{
+			float:left;
+			margin-right:4px;
 		}
 		body > #content > .singleElement{
 			margin-bottom:75px;
@@ -208,6 +164,9 @@ class BitBucketRepo{
 		body > #content > .singleElement > .options > .collapse > .well > h3, body > #content > .singleElement > .options > .collapsing > .well > h3{
 			margin-top:-3px;
 		}
+		body .noHover:hover{
+			color:inherit;
+		}
 	</style>
 </head>
 
@@ -224,9 +183,58 @@ class BitBucketRepo{
 	      <a class="navbar-brand" href="?">Style Guide</a>
 	    </div>
 	    <div id="navbar" class="navbar-collapse collapse">
-	      <ul class="nav navbar-nav">
-            <li class="active"><a>Current Path: <?= $repo->pwd() ?></a></li>
+	      <ul class="nav navbar-nav navbar-right">
             <?php
+	      		$output = str_replace('.html', '', ucwords(str_replace('/', ' > ', str_replace('_', ' ', trim((isset($path))?$path:'', '/')))));
+	      	?>
+	      	<p class="navbar-text"><strong><?= $output ?></strong></p>
+		    <!--<?php
+		    	$curlink = $repo->pwd();
+		    	$repo->cd('..');
+		    	?><li><a href="?path=<?= $repo->currentDir() ?>">Go Up <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span></a></li><?php
+            	$repo->cd($curlink);
+            ?>-->
+          </ul>
+	      <ul class="nav navbar-nav">
+	        <?php
+	        	$current = $repo->pwd();
+	        	$repo->cd('/');
+	        	foreach($repo->ls(false) as $dir): ?>
+	        		<li class="dropdown">
+			          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?= ucfirst(rtrim($dir, '/')) ?><span class="caret"></span></a>
+			          <ul class="dropdown-menu">
+			            <?php 
+			            	$repo->cd($dir);
+			            	if((strpos($repo->pwd(), '/components') === 0)){
+	                            foreach($repo->ls(false) as $item):       //Shows only directories
+	                            //foreach($repo->ls() as $item):              //Shows everything
+	                            	$output = str_replace('.html', '', ucwords(str_replace('_', ' ', trim($item, '/'))));
+	                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= $output ?></a></li><?php
+	                            endforeach;
+	                        }
+	                        elseif((strpos($repo->pwd(), '/templates') === 0)){
+	                            foreach($repo->ls() as $item):
+	                                if(!$repo->isDir($item)){                 //Shows only files
+	                            		$output = str_replace('.html', '', ucwords(str_replace('_', ' ', trim($item, '/'))));
+	                                    ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= $output ?></a></li><?php
+	                                }
+	                            endforeach;                            
+	                        }
+	                        else{
+	                            foreach($repo->ls() as $item):
+	                            	$output = str_replace('.html', '', ucwords(str_replace('_', ' ', trim($item, '/'))));
+	                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= $output ?></a></li><?php
+	                            endforeach;                            
+	                        }
+			            	$repo->cd('..');
+			            ?>
+			          </ul>
+			        </li>
+		    		<?php 
+		    	endforeach;
+		    	$repo->cd($current); 
+		    ?>
+            <!--<?php
             	if($repo->pwd() != '/'){
 		        	foreach($repo->ls(false) as $dir): ?>
 		        		<li class="dropdown">
@@ -244,52 +252,7 @@ class BitBucketRepo{
 			    		<?php 
 			    	endforeach;
 			    }
-		    ?>
-		    <?php
-		    	$curlink = $repo->pwd();
-		    	$repo->cd('..');
-		    ?>
-            <li><a href="?path=<?= $repo->currentDir() ?>">Go Up <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span></a></li>
-            <?php
-            	$repo->cd($curlink);
-            ?>
-          </ul>
-	      <ul class="nav navbar-nav navbar-right">
-	        <?php
-	        	$current = $repo->pwd();
-	        	$repo->cd('/');
-	        	foreach($repo->ls(false) as $dir): ?>
-	        		<li class="dropdown">
-			          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?= ucfirst(rtrim($dir, '/')) ?><span class="caret"></span></a>
-			          <ul class="dropdown-menu">
-			            <?php 
-			            	$repo->cd($dir);
-			            	if((strpos($repo->pwd(), '/components') === 0)){
-	                            foreach($repo->ls(false) as $item):       //Shows only directories
-	                            //foreach($repo->ls() as $item):              //Shows everything
-	                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
-	                            endforeach;
-	                        }
-	                        elseif((strpos($repo->pwd(), '/templates') === 0)){
-	                            foreach($repo->ls() as $item):
-	                                if(!$repo->isDir($item)){                 //Shows only files
-	                                    ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
-	                                }
-	                            endforeach;                            
-	                        }
-	                        else{
-	                            foreach($repo->ls() as $item):
-	                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
-	                            endforeach;                            
-	                        }
-			            	$repo->cd('..');
-			            ?>
-			          </ul>
-			        </li>
-		    		<?php 
-		    	endforeach;
-		    	$repo->cd($current); 
-		    ?>
+		    ?>-->
 	      </ul>
 	    </div>
 	  </div>
@@ -306,7 +269,11 @@ class BitBucketRepo{
                     			echo $repo->contents($item);
                     			?>
                     			<div class="options">
-                    				<button class="btn btn-primary" type="button">Download</button>
+                    				<form action="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]" ?>" method="POST">
+			            				<input type="text" name="downloadpath" style="display:none;" value="<?= $repo->pwd().'/'.$item ?>" />
+			            				<input type="text" name="download" style="display:none;" value="TRUE" />
+			            				<input type="submit" class="btn btn-primary" value="Download"></input>
+			            			</form>
 									<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#code<?= $counter ?>" aria-expanded="false" aria-controls="code<?= $counter ?>">
 										Code
 									</button>
@@ -333,14 +300,14 @@ class BitBucketRepo{
                     }
                 }
                 elseif(strpos($repo->pwd(), '/templates') === 0){
-                    echo "<pre>" . $repo->pwd() . ":<br>";
-                    print_r($repo->ls());
-                    echo "</pre>";
+                    //echo "<pre>" . $repo->pwd() . ":<br>";
+                    //print_r($repo->ls());
+                    //echo "</pre>";
                 }
                 else{
-                    echo "<pre>" . $repo->pwd() . ":<br>";
-                    print_r($repo->ls());
-                    echo "</pre>";
+                    //echo "<pre>" . $repo->pwd() . ":<br>";
+                    //print_r($repo->ls());
+                    //echo "</pre>";
                 }
             }
             else{
@@ -348,7 +315,7 @@ class BitBucketRepo{
                 ?>
             		<div class="options">
             			<form action="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]" ?>" method="POST">
-            				<input type="text" name="path" style="display:none;" value="<?= $repo->pwd() ?>" />
+            				<input type="text" name="downloadpath" style="display:none;" value="<?= $path ?>" />
             				<input type="text" name="download" style="display:none;" value="TRUE" />
             				<input type="submit" class="btn btn-primary" value="Download"></input>
             			</form>
