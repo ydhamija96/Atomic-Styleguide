@@ -92,7 +92,7 @@ class BitBucketRepo{
 		return file_get_contents($this->link($path));
 	}
     public function parentDir(){
-        return implode('/', array_slice($this->currentLoc,0,-1));
+        return end(array_values($this->currentLoc));
     }
     public function isDir($path){
         $old = $this->pwd();
@@ -101,9 +101,28 @@ class BitBucketRepo{
         $this->cd($old);
         return $result;
     }
+    private function copyToServer($path){
+    	$path = rtrim($path, '/');
+    	$originalLocation = $this->pwd();
+    	$this->cd($path);
+    	mkdir(end(array_values($this->currentLoc)));
+    	foreach($this->ls() as $file){
+    		if(!$this->isDir($file)){
+    			file_put_contents($this->parentDir().'/'.$file, $this->contents($file));
+    		}
+    		else{
+    			$garbage = $this->copyToServer($path.'/'.$file);
+    		}
+    	}
+    	$name = $this->parentDir();
+    	$this->cd($originalLocation);
+    	return $name;
+    }
+    public function download($path){
+    	$file = $this->copyToServer($path);
+    }
 }
 ?>
-
 
 <?php session_start(); ?>
 <!DOCTYPE html>
@@ -131,6 +150,9 @@ class BitBucketRepo{
 		else{
 			$repo->cd('/');
             $singleFile = false;
+		}
+		if(isset($_POST['download']) && isset($_POST['path']) && $_POST['download'] == "TRUE"){
+			$repo->download($_POST['path']);
 		}
 	?>
 	<style>
@@ -204,16 +226,16 @@ class BitBucketRepo{
 			            <?php 
 			            	$repo->cd($dir);
 			            	if((strpos($repo->pwd(), '/components') === 0)){
-	                            //foreach($repo->ls(false) as $item):       //Shows only directories
-	                            foreach($repo->ls() as $item):              //Shows everything
+	                            foreach($repo->ls(false) as $item):       //Shows only directories
+	                            //foreach($repo->ls() as $item):              //Shows everything
 	                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
 	                            endforeach;
 	                        }
 	                        elseif((strpos($repo->pwd(), '/templates') === 0)){
 	                            foreach($repo->ls() as $item):
-	                                //if(!$repo->isDir($item)){                 //Shows only files
+	                                if(!$repo->isDir($item)){                 //Shows only files
 	                                    ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
-	                                //}
+	                                }
 	                            endforeach;                            
 	                        }
 	                        else{
@@ -286,7 +308,11 @@ class BitBucketRepo{
                 echo $repo->contents($path);
                 ?>
             		<div class="options">
-            			<button class="btn btn-primary" type="button">Download</button>
+            			<form action="?" method="POST">
+            				<input type="text" name="path" style="display:none;" value="<?= $path ?>" />
+            				<input type="text" name="download" style="display:none;" value="TRUE" />
+            				<input type="submit" class="btn btn-primary" value="Download"></input>
+            			</form>
             		</div>
         		<?php
             }
