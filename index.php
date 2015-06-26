@@ -1,5 +1,4 @@
 <?php
-
 class BitBucketRepo{
 	private $directoryListing = array();
 	private $parentURL;
@@ -82,12 +81,7 @@ class BitBucketRepo{
 		return $result;
 	}
 	public function link($path){
-		if($path[0] == '/'){
-			return ($this->parentURL . substr($path, 1));
-		}
-		else{
-			return ($this->parentURL . implode('/', $this->currentLoc) . '/' . $path);
-		}		
+		return (rtrim($this->parentURL, '/') . '/' . ((count($this->currentLoc) > 0) ? trim(implode('/', $this->currentLoc), '/') . '/' : '') . ltrim($path, '/'));
 	}
 	public function contents($path){
 		return file_get_contents($this->link($path));
@@ -98,12 +92,11 @@ class BitBucketRepo{
     public function isDir($path){
         $old = $this->pwd();
         $this->cd($path);
-        $result = ($this->currentLoc[ count($this->currentLoc)-1 ] == rtrim($path, '/'));
+        $result = (end(array_values($this->currentLoc)) == rtrim($path, '/'));
         $this->cd($old);
         return $result;
     }
 }
-
 ?>
 
 
@@ -114,25 +107,42 @@ class BitBucketRepo{
 <head>
 	<title>NYU Atomic Styleguide</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-</head>
-
-<body>
 	<?php
 		if(isset($_SESSION['repo'])){
 			$repo = $_SESSION['repo'];
 		}
 		else{
 			$repo = new BitBucketRepo('https://bitbucket.org/api/1.0/repositories/ydhamija96/nyu-bitbucket-design-nav/raw/master/CONTENTS/');
-		};
+		}
+		$repo->cd('/');
+		if(in_array('master.css', $repo->ls()) && !$repo->isDir('master.css')){
+			?><link rel="stylesheet" href="<?= $repo->link('master.css') ?>"><?php
+		}
 		if(isset($_GET['path']) && trim($_GET['path']) != ''){
 			$path = urldecode($_GET['path']);
 			$repo->cd($path);
             $singleFile = !(trim($repo->pwd(), '/') == trim($path, '/'));
-		}else{
+		}
+		else{
 			$repo->cd('/');
             $singleFile = false;
 		}
 	?>
+	<style>
+		#singleElement{
+			margin-bottom:25px;
+		}
+		#content{
+			width:100%;
+			max-width:1170px;
+			padding:15px;
+			margin:auto;
+			margin-top:75px;
+		}
+	</style>
+</head>
+
+<body>
 	<nav class="navbar navbar-inverse navbar-fixed-top">
 	  <div class="container">
 	    <div class="navbar-header">
@@ -145,62 +155,101 @@ class BitBucketRepo{
 	      <a class="navbar-brand" href="?">Style Guide</a>
 	    </div>
 	    <div id="navbar" class="navbar-collapse collapse">
-	      <ul class="nav navbar-nav navbar-right">
-	        <?php foreach($repo->ls(false) as $dir): ?>
-        		<li class="dropdown">
-		          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?= ucfirst(rtrim($dir, '/')) ?><span class="caret"></span></a>
-		          <ul class="dropdown-menu">
-		            <?php 
-		            	$repo->cd($dir);
-		            	if((strpos($repo->pwd(), '/components') === 0)){
-                            //foreach($repo->ls(false) as $item):       //Shows only directories
-                            foreach($repo->ls() as $item):              //Shows everything
-                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
-                            endforeach;
-                        }
-                        elseif((strpos($repo->pwd(), '/templates') === 0)){
-                            foreach($repo->ls() as $item):
-                                //if(!$repo->isDir($item)){                 //Shows only files
-                                    ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
-                                //}
-                            endforeach;                            
-                        }
-                        else{
-                            foreach($repo->ls() as $item):
-                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
-                            endforeach;                            
-                        }
-		            	$repo->cd('..');
-		            ?>
-		          </ul>
-		        </li>
-		    <?php endforeach; ?>
-	      </ul>
 	      <ul class="nav navbar-nav">
             <li class="active"><a>Current Path: <?= $repo->pwd() ?></a></li>
+            <?php
+            	if($repo->pwd() != '/'){
+		        	foreach($repo->ls(false) as $dir): ?>
+		        		<li class="dropdown">
+				          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?= ucfirst(rtrim($dir, '/')) ?><span class="caret"></span></a>
+				          <ul class="dropdown-menu">
+				            <?php 
+				            	$repo->cd($dir);
+				            	if((strpos($repo->pwd(), '/components') === 0)){
+		                            //foreach($repo->ls(false) as $item):       //Shows only directories
+		                            foreach($repo->ls() as $item):              //Shows everything
+		                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
+		                            endforeach;
+		                        }
+		                        elseif((strpos($repo->pwd(), '/templates') === 0)){
+		                            foreach($repo->ls() as $item):
+		                                //if(!$repo->isDir($item)){                 //Shows only files
+		                                    ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
+		                                //}
+		                            endforeach;                            
+		                        }
+		                        else{
+		                            foreach($repo->ls() as $item):
+		                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
+		                            endforeach;                            
+		                        }
+				            	$repo->cd('..');
+				            ?>
+				          </ul>
+				        </li>
+			    		<?php 
+			    	endforeach;
+			    }
+		    ?>
             <li><a href="?path=<?= $repo->parentDir() ?>">Go Up <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span></a></li>
           </ul>
+	      <ul class="nav navbar-nav navbar-right">
+	        <?php
+	        	$current = $repo->pwd();
+	        	$repo->cd('/');
+	        	foreach($repo->ls(false) as $dir): ?>
+	        		<li class="dropdown">
+			          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?= ucfirst(rtrim($dir, '/')) ?><span class="caret"></span></a>
+			          <ul class="dropdown-menu">
+			            <?php 
+			            	$repo->cd($dir);
+			            	if((strpos($repo->pwd(), '/components') === 0)){
+	                            //foreach($repo->ls(false) as $item):       //Shows only directories
+	                            foreach($repo->ls() as $item):              //Shows everything
+	                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
+	                            endforeach;
+	                        }
+	                        elseif((strpos($repo->pwd(), '/templates') === 0)){
+	                            foreach($repo->ls() as $item):
+	                                //if(!$repo->isDir($item)){                 //Shows only files
+	                                    ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
+	                                //}
+	                            endforeach;                            
+	                        }
+	                        else{
+	                            foreach($repo->ls() as $item):
+	                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
+	                            endforeach;                            
+	                        }
+			            	$repo->cd('..');
+			            ?>
+			          </ul>
+			        </li>
+		    		<?php 
+		    	endforeach;
+		    	$repo->cd($current); 
+		    ?>
+	      </ul>
 	    </div>
 	  </div>
 	</nav>
-	<div id="content" style="margin-top:50px">
+	<div id="content">
 		<?php
             if(!$singleFile){
                 if(strpos($repo->pwd(), '/components') === 0){
-                    echo "<pre>" . $repo->pwd() . ":<br>";
-                    print_r($repo->ls());
-                    echo "</pre>";
+                    foreach($repo->ls() as $item){
+                    	if(!$repo->isDir($item)){
+                    		echo '<div id="singleElement">';
+                    			echo $repo->contents($item);
+                    		echo '</div>';
+                    	}
+                    }
                 }
                 elseif(strpos($repo->pwd(), '/templates') === 0){
-                    if(count($repo->ls(false)) > 0){
-                        echo "<pre>" . $repo->pwd() . ":<br>";
-                        print_r($repo->ls());
-                        echo "</pre>";
-                    }
-                    else{
-                        foreach($repo->ls() as $item){
-                            echo $repo->contents($item);
-                        }
+                    foreach($repo->ls() as $item){
+                    	if(!$repo->isDir($item)){
+                    		echo $repo->contents($item);
+                    	}
                     }
                 }
                 else{
@@ -219,6 +268,12 @@ class BitBucketRepo{
     <script src="http://getbootstrap.com/dist/js/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
+    <?php
+    	$repo->cd('/');
+		if(in_array('scripts.js', $repo->ls()) && !$repo->isDir('scripts.js')){
+			?><script src="<?= $repo->link('scripts.js') ?>"></script><?php
+		}
+	?>
 </body>
 
 </html>
