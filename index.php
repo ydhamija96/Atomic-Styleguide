@@ -101,25 +101,48 @@ class BitBucketRepo{
         $this->cd($old);
         return $result;
     }
-    private function copyToServer($path){
+    private function copyToServer($path, $iter = 0){
     	$path = rtrim($path, '/');
-    	$originalLocation = $this->pwd();
+    	$oldLocation = $this->pwd();
     	$this->cd($path);
-    	mkdir(end(array_values($this->currentLoc)));
-    	foreach($this->ls() as $file){
-    		if(!$this->isDir($file)){
-    			file_put_contents($this->parentDir().'/'.$file, $this->contents($file));
+    	$name = $this->parentDir();
+    	if($iter == 0){
+    		$date = new DateTime();
+			$timestamp = $date->getTimestamp();
+	    	mkdir('files' . $timestamp);
+	    	chdir('files' . $timestamp);
+    		$oldlink = $this->pwd();
+    		$this->cd('/');
+    		foreach($this->ls() as $item){
+    			if(!$this->isDir($item)){
+    				file_put_contents('./'.$item, $this->contents($item));
+    			}
+    		}
+    		$this->cd($oldlink);
+    	}
+    	mkdir($name);
+    	chdir($name);
+    	foreach($this->ls() as $item){
+    		if($this->isDir($item)){
+    			$this->copyToServer($path .'/'. $item, ++$iter);
     		}
     		else{
-    			$garbage = $this->copyToServer($path.'/'.$file);
+    			file_put_contents('./'.$item, $this->contents($item));
     		}
     	}
-    	$name = $this->parentDir();
-    	$this->cd($originalLocation);
-    	return $name;
+    	chdir('../');
+    	$this->cd($oldLocation);
+    	if($iter==0){
+    		return $timestamp;
+    	}
+    	else{
+    		return 0;
+    	}
     }
     public function download($path){
-    	$file = $this->copyToServer($path);
+    	$timestamp = $this->copyToServer($path);
+    	$filename = 'files' . $timestamp;
+    	echo $filename;
     }
 }
 ?>
@@ -308,8 +331,8 @@ class BitBucketRepo{
                 echo $repo->contents($path);
                 ?>
             		<div class="options">
-            			<form action="?" method="POST">
-            				<input type="text" name="path" style="display:none;" value="<?= $path ?>" />
+            			<form action="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]" ?>" method="POST">
+            				<input type="text" name="path" style="display:none;" value="<?= $repo->pwd() ?>" />
             				<input type="text" name="download" style="display:none;" value="TRUE" />
             				<input type="submit" class="btn btn-primary" value="Download"></input>
             			</form>
