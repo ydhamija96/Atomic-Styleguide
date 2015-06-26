@@ -133,16 +133,21 @@ class BitBucketRepo{
     	chdir('../');
     	$this->cd($oldLocation);
     	if($iter==0){
+    		chdir('../');
     		return $timestamp;
     	}
     	else{
     		return 0;
     	}
     }
+
     public function download($path){
     	$timestamp = $this->copyToServer($path);
-    	$filename = 'files' . $timestamp;
-    	echo $filename;
+    	$filename = "files" . $timestamp;
+    	exec("zip -r $filename.zip $filename");
+    	$fp = fopen("$filename.zip","r");
+        //echo fpassthru($fp);
+        //unlink("../$filename");
     }
 }
 ?>
