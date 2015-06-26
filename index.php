@@ -1,7 +1,5 @@
 <?php
 
-//URL: https://bitbucket.org/api/1.0/repositories/ydhamija96/nyu-bitbucket-design-nav/raw/master/CONTENTS/
-
 class BitBucketRepo{
 	private $directoryListing = array();
 	private $parentURL;
@@ -94,6 +92,16 @@ class BitBucketRepo{
 	public function contents($path){
 		return file_get_contents($this->link($path));
 	}
+    public function parentDir(){
+        return implode('/', array_slice($this->currentLoc,0,-1));
+    }
+    public function isDir($path){
+        $old = $this->pwd();
+        $this->cd($path);
+        $result = ($this->currentLoc[ count($this->currentLoc)-1 ] == rtrim($path, '/'));
+        $this->cd($old);
+        return $result;
+    }
 }
 
 ?>
@@ -116,12 +124,13 @@ class BitBucketRepo{
 		else{
 			$repo = new BitBucketRepo('https://bitbucket.org/api/1.0/repositories/ydhamija96/nyu-bitbucket-design-nav/raw/master/CONTENTS/');
 		};
-		if(isset($_GET['path'])){
+		if(isset($_GET['path']) && trim($_GET['path']) != ''){
 			$path = urldecode($_GET['path']);
 			$repo->cd($path);
-			echo $path;
+            $singleFile = !(trim($repo->pwd(), '/') == trim($path, '/'));
 		}else{
 			$repo->cd('/');
+            $singleFile = false;
 		}
 	?>
 	<nav class="navbar navbar-inverse navbar-fixed-top">
@@ -136,47 +145,73 @@ class BitBucketRepo{
 	      <a class="navbar-brand" href="?">Style Guide</a>
 	    </div>
 	    <div id="navbar" class="navbar-collapse collapse">
-	      <ul class="nav navbar-nav">
-	      	<?php 
-	      		$oldPath = $repo->pwd();
-	      		$repo->cd('/');
-	      	?>
+	      <ul class="nav navbar-nav navbar-right">
 	        <?php foreach($repo->ls(false) as $dir): ?>
         		<li class="dropdown">
 		          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?= ucfirst(rtrim($dir, '/')) ?><span class="caret"></span></a>
 		          <ul class="dropdown-menu">
 		            <?php 
 		            	$repo->cd($dir);
-		            	$showAll = !(strpos($repo->pwd(), '/components') === 0);
-		            	foreach($repo->ls($showAll) as $item):
-		            		?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
-		            	endforeach;
+		            	if((strpos($repo->pwd(), '/components') === 0)){
+                            //foreach($repo->ls(false) as $item):       //Shows only directories
+                            foreach($repo->ls() as $item):              //Shows everything
+                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
+                            endforeach;
+                        }
+                        elseif((strpos($repo->pwd(), '/templates') === 0)){
+                            foreach($repo->ls() as $item):
+                                //if(!$repo->isDir($item)){                 //Shows only files
+                                    ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
+                                //}
+                            endforeach;                            
+                        }
+                        else{
+                            foreach($repo->ls() as $item):
+                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
+                            endforeach;                            
+                        }
 		            	$repo->cd('..');
 		            ?>
 		          </ul>
 		        </li>
 		    <?php endforeach; ?>
-		    <?php
-		    	$repo->cd($oldPath);
-		    ?>
 	      </ul>
-	      <ul class="nav navbar-nav navbar-right">
+	      <ul class="nav navbar-nav">
             <li class="active"><a>Current Path: <?= $repo->pwd() ?></a></li>
+            <li><a href="?path=<?= $repo->parentDir() ?>">Go Up <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span></a></li>
           </ul>
 	    </div>
 	  </div>
 	</nav>
 	<div id="content" style="margin-top:50px">
 		<?php
-			if(strpos($repo->pwd(), '/components') === 0){
-				echo "IN COMPONENTS";
-			}
-			elseif(strpos($repo->pwd(), '/templates') === 0){
-				echo "IN TEMPLATES";
-			}
-			else{
-				echo $repo->pwd();
-			}
+            if(!$singleFile){
+                if(strpos($repo->pwd(), '/components') === 0){
+                    echo "<pre>" . $repo->pwd() . ":<br>";
+                    print_r($repo->ls());
+                    echo "</pre>";
+                }
+                elseif(strpos($repo->pwd(), '/templates') === 0){
+                    if(count($repo->ls(false)) > 0){
+                        echo "<pre>" . $repo->pwd() . ":<br>";
+                        print_r($repo->ls());
+                        echo "</pre>";
+                    }
+                    else{
+                        foreach($repo->ls() as $item){
+                            echo $repo->contents($item);
+                        }
+                    }
+                }
+                else{
+                    echo "<pre>" . $repo->pwd() . ":<br>";
+                    print_r($repo->ls());
+                    echo "</pre>";
+                }
+            }
+            else{
+                echo $repo->contents($path);
+            }
 		?>
 	</div>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
