@@ -134,10 +134,10 @@ class BitBucketRepo{
 		}
 	?>
 	<style>
-		#singleElement{
+		body > #content > #singleElement{
 			margin-bottom:25px;
 		}
-		#content{
+		body > #content{
 			width:100%;
 			max-width:1170px;
 			padding:15px;
