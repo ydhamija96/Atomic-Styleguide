@@ -170,7 +170,7 @@ class BitBucketRepo{
     	foreach($repo->ls() as $file){
     		if(!$repo->isDir($file)){
     			if(substr($file, -4) == '.css'){
-    				?><script src="<?= $repo->link($file) ?>"></script><?php
+    				?><style rel="stylesheet" href="<?= $repo->link($file) ?>"></script><?php
     			}
     		}
     	}
@@ -245,7 +245,14 @@ class BitBucketRepo{
 			    	endforeach;
 			    }
 		    ?>
+		    <?php
+		    	$curlink = $repo->pwd();
+		    	$repo->cd('..');
+		    ?>
             <li><a href="?path=<?= $repo->currentDir() ?>">Go Up <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span></a></li>
+            <?php
+            	$repo->cd($curlink);
+            ?>
           </ul>
 	      <ul class="nav navbar-nav navbar-right">
 	        <?php
