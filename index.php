@@ -149,6 +149,7 @@ class BitBucketRepo{
 		}
 		body > #content > .singleElement > .options > .collapse > .well, body > #content > .singleElement > .options > .collapsing > .well{
 			margin-top:5px;
+			margin-bottom:5px;
 		}
 		body > #content > .singleElement > .options > .collapse > .well > h3, body > #content > .singleElement > .options > .collapsing > .well > h3{
 			margin-top:-3px;
