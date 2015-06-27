@@ -133,7 +133,7 @@ class BitBucketRepo{
         $oldlocation = $this->pwd();
         $this->cd($item);
         foreach($this->ls(false) as $asset){
-            //if($asset == 'assets_'.$foldername.'/'){      // Store each template/component assets in a separate folder (assets_templateORcomponentName)?
+            //if($asset == 'assets_'.$foldername.'/'){      // Store each template/component assets in a separate folder (assets_templateOrComponentName)?
                 $this->getFolder($this->pwd().'/'.$asset, $rootname.'/'.$foldername);
             //}
         }
@@ -164,9 +164,26 @@ class BitBucketRepo{
     }
     public function download($item){
         $folder = $this->copyToServer($item);
+
         // Zip up the folder inside $folder
+
         // Have the client download that
+
         // Delete $folder (the actual dir, not the variable)
+
+    }
+    private function fixRelatives($text){
+    	$result = $text;
+
+    	// Change result such that all relative paths
+    		// like images/pic.png
+    		// are changed to the apprpriate bitbucket URL
+    		// like https://bitbucket.org/api/1.0/repositories/mricotta/nyu/raw/master/images/pic.png
+
+    	return $result;
+    }
+    public function fixedcontents($path){
+    	return $this->fixRelatives($this->contents($path));
     }
 }
 ?>
@@ -179,20 +196,25 @@ class BitBucketRepo{
 	<title>NYU Atomic Styleguide</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 	<?php
+		// Start repo:
 		if(isset($_SESSION['repo'])){
 			$repo = $_SESSION['repo'];
 		}
 		else{
 			$repo = new BitBucketRepo('https://bitbucket.org/api/1.0/repositories/mricotta/nyu/raw/master/');
 		}
+
+		// Output CSS inline:
     	$repo->cd('/');
     	foreach($repo->ls() as $file){
     		if(!$repo->isDir($file)){
     			if(substr($file, -4) == '.css'){
-    				?><style><?= $repo->contents($file) ?>"></style><?php
+    				?><style><?= $repo->fixedcontents($file) ?>"></style><?php
     			}
     		}
     	}
+
+    	// Traverse the repo to proper location:
 		if(isset($_GET['path']) && trim($_GET['path']) != ''){
 			$path = urldecode($_GET['path']);
 			$repo->cd($path);
@@ -202,6 +224,8 @@ class BitBucketRepo{
 			$repo->cd('/');
             $singleFile = false;
 		}
+
+		// Start the download function if appropriate:
 		if(isset($_GET['download']) && isset($_POST['downloadpath']) && $_GET['download'] == "TRUE"){
 			$repo->download($_POST['downloadpath']);
 		}
@@ -231,9 +255,6 @@ class BitBucketRepo{
 		body > #content > .singleElement > .options > .collapse > .well > h3, body > #content > .singleElement > .options > .collapsing > .well > h3{
 			margin-top:-3px;
 		}
-		body .noHover:hover{
-			color:inherit;
-		}
 	</style>
 </head>
 
@@ -250,20 +271,10 @@ class BitBucketRepo{
 	      <a class="navbar-brand" href="?">Style Guide</a>
 	    </div>
 	    <div id="navbar" class="navbar-collapse collapse">
-	      <ul class="nav navbar-nav navbar-right">
-            <?php
-	      		$output = str_replace('.html', '', ucwords(str_replace('/', ' > ', str_replace('_', ' ', trim((isset($path))?$path:'', '/')))));
-	      	?>
-	      	<p class="navbar-text"><strong><?= $output ?></strong></p>
-		    <!--<?php
-		    	$curlink = $repo->pwd();
-		    	$repo->cd('..');
-		    	?><li><a href="?path=<?= $repo->currentDir() ?>">Go Up <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span></a></li><?php
-            	$repo->cd($curlink);
-            ?>-->
-          </ul>
 	      <ul class="nav navbar-nav">
 	        <?php
+
+	        	// Display all directories in bitbucket root:
 	        	$current = $repo->pwd();
 	        	$repo->cd('/');
 	        	foreach($repo->ls(false) as $dir): ?>
@@ -271,15 +282,17 @@ class BitBucketRepo{
 			          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?= ucfirst(rtrim($dir, '/')) ?><span class="caret"></span></a>
 			          <ul class="dropdown-menu">
 			            <?php 
+
+			            	// Display contents of each directory:
 			            	$repo->cd($dir);
-			            	if((strpos($repo->pwd(), '/components') === 0)){
+			            	if((strpos($repo->pwd(), '/components') === 0)){	//If we're in the components root dir.
 	                            foreach($repo->ls(false) as $item):       //Shows only directories
 	                            //foreach($repo->ls() as $item):              //Shows everything
 	                            	$output = str_replace('.html', '', ucwords(str_replace('_', ' ', trim($item, '/'))));
 	                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= $output ?></a></li><?php
 	                            endforeach;
 	                        }
-	                        elseif((strpos($repo->pwd(), '/templates') === 0)){
+	                        elseif((strpos($repo->pwd(), '/templates') === 0)){	//If we're in the templates root dir.
 	                            foreach($repo->ls() as $item):
 	                                if(!$repo->isDir($item)){                 //Shows only files
 	                            		$output = str_replace('.html', '', ucwords(str_replace('_', ' ', trim($item, '/'))));
@@ -302,12 +315,16 @@ class BitBucketRepo{
 		    	$repo->cd($current); 
 		    ?>
             <!--<?php
+
+            	// Display all directories in the current repo location, if not root:
             	if($repo->pwd() != '/'){
 		        	foreach($repo->ls(false) as $dir): ?>
 		        		<li class="dropdown">
 				          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?= ucfirst(rtrim($dir, '/')) ?><span class="caret"></span></a>
 				          <ul class="dropdown-menu">
 				            <?php 
+
+				            	// Display contents of directory:
 				            	$repo->cd($dir);
 	                            foreach($repo->ls() as $item):
 	                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
@@ -321,19 +338,37 @@ class BitBucketRepo{
 			    }
 		    ?>-->
 	      </ul>
+	      <ul class="nav navbar-nav navbar-right">
+            <?php
+
+            	// Get current location human-readable string:
+	      		$output = str_replace('.html', '', ucwords(str_replace('/', ' > ', str_replace('_', ' ', trim((isset($path))?$path:'', '/')))));
+	      	?>
+	      	<p class="navbar-text"><strong><?= $output ?></strong></p>
+		    <!--<?php
+
+		    	// A 'Go Up' button:
+		    	$curlink = $repo->pwd();
+		    	$repo->cd('..');
+		    	?><li><a href="?path=<?= $repo->currentDir() ?>">Go Up <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span></a></li><?php
+            	$repo->cd($curlink);
+            ?>-->
+          </ul>
 	    </div>
 	  </div>
 	</nav>
 	<div id="content">
 		<?php
-            if(!$singleFile){
-                if(strpos($repo->pwd(), '/components') === 0){
+            if(!$singleFile){	// If the URL does not specify a single file in the repo
+                if(strpos($repo->pwd(), '/components') === 0){	// If in components root dir
                 	$counter = 0;
+
+                	// Display all items that are not directories:
                     foreach($repo->ls() as $item){
                     	if(!$repo->isDir($item)){
                     		++$counter;
                     		echo '<div class="singleElement">';
-                    			echo $repo->contents($item);
+                    			echo $repo->fixedcontents($item);
                     			?>
                     			<div class="options">
                     				<form action="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]&download=TRUE" ?>" method="POST">
@@ -356,7 +391,7 @@ class BitBucketRepo{
 										<div class="well">
 											<h3>Assets</h3>
 											<?= '' ?>
-											A list of assets will be placed here. Clickable to download. More information about BitBucket directory structure is required.
+											A list of assets will be placed here. Clickable to download. Coming soon.
 										</div>
 									</div>
 								</div>
@@ -365,19 +400,24 @@ class BitBucketRepo{
                     	}
                     }
                 }
-                elseif(strpos($repo->pwd(), '/templates') === 0){
-                    //echo "<pre>" . $repo->pwd() . ":<br>";
-                    //print_r($repo->ls());
-                    //echo "</pre>";
+                elseif(strpos($repo->pwd(), '/templates') === 0){	// If in templatesroot dir.
+
+                	// Note: User should never arrive here because templates menu
+                		// only shows single templates files. $singleFile would be true.
+                    echo "<pre>" . $repo->pwd() . ":<br>";
+                    print_r($repo->ls());
+                    echo "</pre>";
                 }
-                else{
-                    //echo "<pre>" . $repo->pwd() . ":<br>";
-                    //print_r($repo->ls());
-                    //echo "</pre>";
+                else{	// If in some other root dir.
+                    echo "<pre>" . $repo->pwd() . ":<br>";
+                    print_r($repo->ls());
+                    echo "</pre>";
                 }
             }
-            else{
-                echo $repo->contents($path);
+            else{	// If a single file is specified in the URL
+
+            	// Display the single item
+                echo $repo->fixedcontents($path);
                 ?>
             		<div class="options">
             			<form action="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]&download=TRUE" ?>" method="POST">
@@ -389,25 +429,24 @@ class BitBucketRepo{
             }
 		?>
 	</div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <?php
+
+    	// Output javascript inline:
+    	$oldlocationlink = $repo->pwd();
     	$repo->cd('/');
     	foreach($repo->ls() as $file){
     		if(!$repo->isDir($file)){
     			if(substr($file, -3) == '.js'){
-    				?><script><?= $repo->contents($file) ?></script><?php
+    				?><script><?= $repo->fixedcontents($file) ?></script><?php
     			}
     		}
     	}
+    	$repo->cd($oldlocationlink);
 	?>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
-    <script>
-		$(function () {
-			$('[data-toggle="popover"]').popover();
-		})
-    </script>
 </body>
 
 </html>
