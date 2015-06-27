@@ -101,6 +101,73 @@ class BitBucketRepo{
         $this->cd($old);
         return $result;
     }
+    private function copyToServer($item){
+        // Create a directory:
+        $date = new DateTime();
+        $stamp = $date->getTimestamp();
+        $rootname = "download_".$stamp;
+        mkdir($rootname);
+        
+        // Get name of file to be downloaded:
+        $filename = explode('/', $item);
+        $filename = end(array_values($filename));
+        
+        // Create a directory and put the actual item in it:
+        $foldername = substr($filename, 0, -5);    // Takes out the .html
+        mkdir($rootname.'/'.$foldername);
+        file_put_contents($rootname.'/'.$foldername.'/'.$filename, $this->contents($item));
+        
+        // Put root .css and .js in it:
+        $oldlocation = $this->pwd();
+        $this->cd('/');
+        foreach($this->ls() as $file){
+            if(!$this->isDir($file)){
+                if(substr($file, -3) == '.js' || substr($file, -4) == '.css'){
+                    file_put_contents($rootname.'/'.$foldername.'/'.$file, $this->contents($file));
+                }
+            }
+        }
+        $this->cd($oldlocation);
+        
+        // Copy any assets:
+        $oldlocation = $this->pwd();
+        $this->cd($item);
+        foreach($this->ls(false) as $asset){
+            //if($asset == 'assets_'.$foldername.'/'){
+                $this->getFolder($this->pwd().'/'.$asset, $rootname.'/'.$foldername);
+            //}
+        }
+        $this->cd($oldlocation);
+        
+        return $rootname;
+    }
+    private function getFolder($folderToGet, $whereToPutIt){
+        // Find out what to name directory:
+        $foldername = explode('/', rtrim($folderToGet, '/'));
+        $foldername = end(array_values($foldername));
+        
+        // Create directory:
+        mkdir($whereToPutIt.'/'.$foldername);
+        
+        // Copy everything:
+        $oldlocation = $this->pwd();
+        $this->cd($folderToGet);
+        foreach($this->ls() as $item){
+            if($this->isDir($item)){    // Copy folders
+                $this->getFolder($item, $whereToPutIt.'/'.$foldername);
+            }
+            else{   // Copy files
+                file_put_contents($whereToPutIt.'/'.$foldername.'/'.$item, $this->contents($item));
+            }
+        }
+        $this->cd($oldlocation);
+    }
+    public function download($item){
+        $folder = $this->copyToServer($item);
+        // Zip up the folder inside $folder
+        // Have the client download that
+        // Delete $folder (the actual dir, not the variable)
+    }
 }
 ?>
 
@@ -272,18 +339,18 @@ class BitBucketRepo{
                     				<form action="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]" ?>" method="POST">
 			            				<input type="text" name="downloadpath" style="display:none;" value="<?= $repo->pwd().'/'.$item ?>" />
 			            				<input type="text" name="download" style="display:none;" value="TRUE" />
-			            				<input type="submit" class="btn btn-primary" value="Download"></input>
+			            				<input type="submit" class="btn btn-primary" value="Download All Files .zip"></input>
 			            			</form>
 									<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#code<?= $counter ?>" aria-expanded="false" aria-controls="code<?= $counter ?>">
-										Code
+										See HTML Code
 									</button>
 									<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#assets<?= $counter ?>" aria-expanded="false" aria-controls="assets<?= $counter ?>">
-										Assets
+										Download Individual Assets
 									</button>
 									<div class="collapse" id="code<?= $counter ?>">
 										<div class="well">
 											<h3>Code</h3>
-											<?= htmlspecialchars($repo->contents($item)) ?>
+											<?= nl2br(htmlspecialchars($repo->contents($item))) ?>
 										</div>
 									</div>
 									<div class="collapse" id="assets<?= $counter ?>">
@@ -340,7 +407,7 @@ class BitBucketRepo{
     <script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
     <script>
 		$(function () {
-			$('[data-toggle="popover"]').popover()
+			$('[data-toggle="popover"]').popover();
 		})
     </script>
 </body>
