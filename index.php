@@ -133,7 +133,7 @@ class BitBucketRepo{
         $oldlocation = $this->pwd();
         $this->cd($item);
         foreach($this->ls(false) as $asset){
-            //if($asset == 'assets_'.$foldername.'/'){
+            //if($asset == 'assets_'.$foldername.'/'){      // Store each template/component assets in a separate folder (assets_templateORcomponentName)?
                 $this->getFolder($this->pwd().'/'.$asset, $rootname.'/'.$foldername);
             //}
         }
@@ -202,7 +202,7 @@ class BitBucketRepo{
 			$repo->cd('/');
             $singleFile = false;
 		}
-		if(isset($_POST['download']) && isset($_POST['downloadpath']) && $_POST['download'] == "TRUE"){
+		if(isset($_GET['download']) && isset($_POST['downloadpath']) && $_GET['download'] == "TRUE"){
 			$repo->download($_POST['downloadpath']);
 		}
 	?>
@@ -336,9 +336,8 @@ class BitBucketRepo{
                     			echo $repo->contents($item);
                     			?>
                     			<div class="options">
-                    				<form action="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]" ?>" method="POST">
+                    				<form action="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]&download=TRUE" ?>" method="POST">
 			            				<input type="text" name="downloadpath" style="display:none;" value="<?= $repo->pwd().'/'.$item ?>" />
-			            				<input type="text" name="download" style="display:none;" value="TRUE" />
 			            				<input type="submit" class="btn btn-primary" value="Download All Files .zip"></input>
 			            			</form>
 									<button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#code<?= $counter ?>" aria-expanded="false" aria-controls="code<?= $counter ?>">
@@ -381,9 +380,8 @@ class BitBucketRepo{
                 echo $repo->contents($path);
                 ?>
             		<div class="options">
-            			<form action="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]" ?>" method="POST">
+            			<form action="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]&download=TRUE" ?>" method="POST">
             				<input type="text" name="downloadpath" style="display:none;" value="<?= $path ?>" />
-            				<input type="text" name="download" style="display:none;" value="TRUE" />
             				<input type="submit" class="btn btn-primary" value="Download"></input>
             			</form>
             		</div>
