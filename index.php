@@ -122,7 +122,7 @@ class BitBucketRepo{
     	foreach($repo->ls() as $file){
     		if(!$repo->isDir($file)){
     			if(substr($file, -4) == '.css'){
-    				?><style rel="stylesheet" href="<?= $repo->link($file) ?>"></script><?php
+    				?><link rel="stylesheet" href="<?= $repo->link($file) ?>"></link><?php
     			}
     		}
     	}
