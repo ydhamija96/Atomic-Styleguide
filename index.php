@@ -174,15 +174,30 @@ class BitBucketRepo{
         }
         $this->cd($oldlocation);
     }
-    public function download($item){
+    public function getDownload($item){
         $folder = $this->copyToServer($item);
+        $zipname = explode('/', glob($folder.'/*')[0])[1];
 
-        // Zip up the folder inside $folder
+        // Zip up the folder inside $folder:
+		$rootPath = realpath($folder.'/'.$zipname);
+		$zip = new ZipArchive();
+		$zip->open($folder.'/'.$zipname.'.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
+		$files = new RecursiveIteratorIterator(
+		    new RecursiveDirectoryIterator($rootPath),
+		    RecursiveIteratorIterator::LEAVES_ONLY
+		);
+		foreach ($files as $name => $file)
+		{
+		    if (!$file->isDir())
+		    {
+		        $filePath = $file->getRealPath();
+		        $relativePath = substr($filePath, strlen($rootPath) + 1);
+		        $zip->addFile($filePath, $relativePath);
+		    }
+		}
+		$zip->close();
 
-        // Have the client download that
-
-        // Delete $folder (the actual dir, not the variable)
-
+		return $folder.'/'.$zipname.'.zip';
     }
     private function fixRelatives($text){
     	$result = $text;
@@ -239,7 +254,18 @@ class BitBucketRepo{
 
 		// Start the download function if appropriate:
 		if(isset($_GET['download']) && isset($_POST['downloadpath']) && $_GET['download'] == "TRUE"){
-			$repo->download($_POST['downloadpath']);
+
+			// Get folder location to download:
+			$file = $repo->getdownload($_POST['downloadpath']);
+
+			// Download folder:
+			header('Content-Disposition: attachment; filename="'.explode('/',$file)[1]."\"");
+	        header('Content-Type: application/zip');
+			header('Content-Length: ' . filesize($file));
+			ob_clean();
+			readfile($file);
+
+			// Delete folder:
 		}
 	?>
 	<style>
