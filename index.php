@@ -64,7 +64,7 @@ class BitBucketRepo{
 		}
 		return $this;
 	}
-	public function ls($all = true){
+	public function ls($all = true, $recursive = false){
 		$listing = $this->directoryListing;
 		$result = array();
 		foreach ($this->currentLoc as $dir) {
@@ -72,7 +72,19 @@ class BitBucketRepo{
 		}
 		foreach($listing as $key => $item){
 			if(is_array($item)){
-				$result[] = $key.'/';
+				if($recursive){
+					$oldlocation = $this->pwd();
+					$this->cd($key);
+					$additionalResults = $this->ls($all, true);
+					foreach($additionalResults as $single){
+						$single = $key.'/'.$single;
+						$result[] = $single;
+					}
+					$this->cd($oldlocation);
+				}
+				else{
+					$result[] = $key.'/';
+				}
 			}
 			elseif($all){
 				$result[] = $key;
@@ -390,8 +402,34 @@ class BitBucketRepo{
 									<div class="collapse" id="assets<?= $counter ?>">
 										<div class="well">
 											<h3>Assets</h3>
-											<?= '' ?>
-											A list of assets will be placed here. Clickable to download. Coming soon.
+											<?php
+												// Output the root css and js files:
+												$oldlocation = $repo->pwd();
+												$repo->cd('/');
+												foreach($repo->ls() as $file){
+													if(!$repo->isDir($file)){
+														if(substr($file, -3) == '.js' || substr($file, -4) == '.css'){
+										    				?><a href="<?= $repo->link($file) ?>" download="<?= $file ?>"><?= $file ?></a><br /><?php
+										    			}
+													}
+												}
+												$repo->cd($oldlocation);
+
+												// Output the file itself:
+												?><a href="<?= $repo->link($item) ?>" download="<?= $item ?>"><?= $item ?></a><br /><?php
+
+												// Output any assets:
+												foreach($repo->ls(false) as $folder){
+										            //if($folder == 'assets_'.$item.'/'){      // Store each template/component assets in a separate folder (assets_templateOrComponentName)?
+										                $oldlocation = $repo->pwd();
+										                $repo->cd($folder);
+										                foreach($repo->ls(true, true) as $item){
+										                	?><a href="<?= $repo->link($item) ?>" download="<?= $item ?>"><?= $item ?></a><br /><?php
+										                }
+										                $repo->cd($oldlocation);
+										            //}
+												}
+											?>
 										</div>
 									</div>
 								</div>
