@@ -223,12 +223,16 @@ class BitBucketRepo{
 		}
     }
     private function fixRelatives($text){
-    	$result = $text;
+    	// Find all relative URLs
+    	$pattern = '/(?:src|href)\s*=\s*["\']()\s*(?!#|\?|https:\/\/|http:\/\/|\/\/|www\.).+?[\'"]/i';
+    	
+    	// Calculate what to prepend
+    	$prepend = $this->pwd();
+    	$prepend = ltrim($prepend, '/');
+    	$prepend = $this->parentURL . $prepend;
 
-    	// Change result such that all relative paths
-    		// like images/pic.png
-    		// are changed to the apprpriate bitbucket URL
-    		// like https://bitbucket.org/api/1.0/repositories/mricotta/nyu/raw/master/images/pic.png
+    	// Run the regex
+    	$result = preg_replace($pattern, $prepend, $text);
 
     	return $result;
     }
@@ -259,7 +263,7 @@ class BitBucketRepo{
     	foreach($repo->ls() as $file){
     		if(!$repo->isDir($file)){
     			if(substr($file, -4) == '.css'){
-    				?><style><?= $repo->fixedcontents($file) ?>"></style><?php
+    				?><style><?= $repo->fixedcontents($file) ?></style><?php
     			}
     		}
     	}
@@ -318,6 +322,7 @@ class BitBucketRepo{
 		 height: 125px;
 		 display: inline-block;
 		 font-weight: bold;
+		 margin-bottom:3px;
 		}
 		/* end style guide Demo class */
 	</style>
