@@ -278,7 +278,7 @@ class BitBucketRepo{
 		// Start the download function if appropriate:
 		if(isset($_GET['download']) && isset($_POST['downloadpath']) && $_GET['download'] == "TRUE"){
 			$file = $repo->getdownload($_POST['downloadpath']);
-			?><script>window.open('<?= $file ?>', '_blank');</script><?php
+			?><script>window.open('<?= $file ?>');</script><?php
 			$repo->clearDownloads(100);
 		}
 	?>
