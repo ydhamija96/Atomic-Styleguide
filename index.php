@@ -224,12 +224,12 @@ class BitBucketRepo{
     }
     private function fixRelatives($text){
     	// Find all relative URLs
-    	$pattern = '/(?:src|href)\s*=\s*["\']()\s*(?!#|\?|https:\/\/|http:\/\/|\/\/|www\.).+?[\'"]/i';
+    	$pattern = '/(?:src|href)\s*=\s*["\']()\s*(?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.).+?[\'"]/i';
     	
     	// Calculate what to prepend
     	$prepend = $this->pwd();
-    	$prepend = ltrim($prepend, '/');
-    	$prepend = $this->parentURL . $prepend;
+    	$prepend = trim($prepend, '/');
+    	$prepend = $this->parentURL . $prepend . '/';
 
     	// Run the regex
     	$result = preg_replace($pattern, $prepend, $text);
