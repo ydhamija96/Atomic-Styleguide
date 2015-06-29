@@ -307,6 +307,19 @@ class BitBucketRepo{
 		body > #content > .singleElement > .options > .collapse > .well > h3, body > #content > .singleElement > .options > .collapsing > .well > h3{
 			margin-top:-3px;
 		}
+		/* Demo class is a class used only by the repository style guide, it's intended to set styles for the repository */
+		.demo_class {
+		 color: #6d6d6d;
+		 font-family: Arial;
+		}
+		.demo_class .palette,
+		.demo_class .palette_lte {
+		 width: 125px;
+		 height: 125px;
+		 display: inline-block;
+		 font-weight: bold;
+		}
+		/* end style guide Demo class */
 	</style>
 </head>
 
@@ -409,7 +422,7 @@ class BitBucketRepo{
 	    </div>
 	  </div>
 	</nav>
-	<div id="content">
+	<div id="content" class="demo_class">
 		<?php
             if(!$singleFile){	// If the URL does not specify a single file in the repo
                 if(strpos($repo->pwd(), '/components') === 0){	// If in components root dir
