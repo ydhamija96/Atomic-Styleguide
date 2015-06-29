@@ -213,11 +213,11 @@ class BitBucketRepo{
 	    }
 	    rmdir($dirPath);
 	}
-    public function clearDownloads(){
+    public function clearDownloads($seconds){
         $date = new DateTime();
         $stamp = $date->getTimestamp();
     	foreach (glob("download_*") as $filename) {
-    		if(intval(substr($filename, 9)+100) < ($stamp)){
+    		if(intval(substr($filename, 9)+$seconds) < ($stamp)){
     			$this->deleteDir($filename);
     		}
 		}
@@ -279,7 +279,7 @@ class BitBucketRepo{
 		if(isset($_GET['download']) && isset($_POST['downloadpath']) && $_GET['download'] == "TRUE"){
 			$file = $repo->getdownload($_POST['downloadpath']);
 			?><script>window.open('<?= $file ?>', '_blank');</script><?php
-			$repo->clearDownloads();
+			$repo->clearDownloads(100);
 		}
 	?>
 	<style>
