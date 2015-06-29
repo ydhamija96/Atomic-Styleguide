@@ -330,100 +330,100 @@ class BitBucketRepo{
 <body>
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="?">Style Guide</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-            <?php
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="?">Style Guide</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <?php
 
-                // Display all directories in bitbucket root:
-                $current = $repo->pwd();
-                $repo->cd('/');
-                foreach($repo->ls(false) as $dir): ?>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?= ucfirst(rtrim($dir, '/')) ?><span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                        <?php 
+                        // Display all directories in bitbucket root:
+                        $current = $repo->pwd();
+                        $repo->cd('/');
+                        foreach($repo->ls(false) as $dir): ?>
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?= ucfirst(rtrim($dir, '/')) ?><span class="caret"></span></a>
+                                <ul class="dropdown-menu">
+                                    <?php 
 
-                            // Display contents of each directory:
-                            $repo->cd($dir);
-                            if((strpos($repo->pwd(), '/components') === 0)){    //If we're in the components root dir.
-                                foreach($repo->ls(false) as $item):       //Shows only directories
-                                //foreach($repo->ls() as $item):              //Shows everything
-                                    $output = str_replace('.html', '', ucwords(str_replace('_', ' ', trim($item, '/'))));
-                                    ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= $output ?></a></li><?php
-                                endforeach;
-                            }
-                            elseif((strpos($repo->pwd(), '/templates') === 0)){ //If we're in the templates root dir.
-                                foreach($repo->ls() as $item):
-                                    if(!$repo->isDir($item)){                 //Shows only files
-                                        $output = str_replace('.html', '', ucwords(str_replace('_', ' ', trim($item, '/'))));
-                                        ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= $output ?></a></li><?php
-                                    }
-                                endforeach;                            
-                            }
-                            else{
-                                foreach($repo->ls() as $item):
-                                    $output = str_replace('.html', '', ucwords(str_replace('_', ' ', trim($item, '/'))));
-                                    ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= $output ?></a></li><?php
-                                endforeach;                            
-                            }
-                            $repo->cd('..');
-                        ?>
-                        </ul>
-                    </li>
-                    <?php 
-                endforeach;
-                $repo->cd($current); 
-            ?>
-            <!--<?php
-
-                // Display all directories in the current repo location, if not root:
-                if($repo->pwd() != '/'){
-                    foreach($repo->ls(false) as $dir): ?>
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?= ucfirst(rtrim($dir, '/')) ?><span class="caret"></span></a>
-                            <ul class="dropdown-menu">
+                                        // Display contents of each directory:
+                                        $repo->cd($dir);
+                                        if((strpos($repo->pwd(), '/components') === 0)){    //If we're in the components root dir.
+                                            foreach($repo->ls(false) as $item):       //Shows only directories
+                                            //foreach($repo->ls() as $item):              //Shows everything
+                                                $output = str_replace('.html', '', ucwords(str_replace('_', ' ', trim($item, '/'))));
+                                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= $output ?></a></li><?php
+                                            endforeach;
+                                        }
+                                        elseif((strpos($repo->pwd(), '/templates') === 0)){ //If we're in the templates root dir.
+                                            foreach($repo->ls() as $item):
+                                                if(!$repo->isDir($item)){                 //Shows only files
+                                                    $output = str_replace('.html', '', ucwords(str_replace('_', ' ', trim($item, '/'))));
+                                                    ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= $output ?></a></li><?php
+                                                }
+                                            endforeach;                            
+                                        }
+                                        else{
+                                            foreach($repo->ls() as $item):
+                                                $output = str_replace('.html', '', ucwords(str_replace('_', ' ', trim($item, '/'))));
+                                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= $output ?></a></li><?php
+                                            endforeach;                            
+                                        }
+                                        $repo->cd('..');
+                                    ?>
+                                </ul>
+                            </li>
                             <?php 
+                        endforeach;
+                        $repo->cd($current); 
+                    ?>
+                    <!--<?php
 
-                                // Display contents of directory:
-                                $repo->cd($dir);
-                                foreach($repo->ls() as $item):
-                                    ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
-                                endforeach;
-                                $repo->cd('..');
-                            ?>
-                            </ul>
-                        </li>
-                        <?php 
-                    endforeach;
-                }
-            ?>-->
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-            <?php
+                        // Display all directories in the current repo location, if not root:
+                        if($repo->pwd() != '/'){
+                            foreach($repo->ls(false) as $dir): ?>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?= ucfirst(rtrim($dir, '/')) ?><span class="caret"></span></a>
+                                    <ul class="dropdown-menu">
+                                    <?php 
 
-                // Get current location human-readable string:
-                $output = str_replace('.html', '', ucwords(str_replace('/', ' > ', str_replace('_', ' ', trim((isset($path))?$path:'', '/')))));
-            ?>
-            <p class="navbar-text"><strong><?= $output ?></strong></p>
-            <!--<?php
+                                        // Display contents of directory:
+                                        $repo->cd($dir);
+                                        foreach($repo->ls() as $item):
+                                            ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
+                                        endforeach;
+                                        $repo->cd('..');
+                                    ?>
+                                    </ul>
+                                </li>
+                                <?php 
+                            endforeach;
+                        }
+                    ?>-->
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <?php
 
-                // A 'Go Up' button:
-                $curlink = $repo->pwd();
-                $repo->cd('..');
-                ?><li><a href="?path=<?= $repo->currentDir() ?>">Go Up <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span></a></li><?php
-                $repo->cd($curlink);
-            ?>-->
-            </ul>
-        </div>
+                        // Get current location human-readable string:
+                        $output = str_replace('.html', '', ucwords(str_replace('/', ' > ', str_replace('_', ' ', trim((isset($path))?$path:'', '/')))));
+                    ?>
+                    <p class="navbar-text"><strong><?= $output ?></strong></p>
+                    <!--<?php
+
+                        // A 'Go Up' button:
+                        $curlink = $repo->pwd();
+                        $repo->cd('..');
+                        ?><li><a href="?path=<?= $repo->currentDir() ?>">Go Up <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span></a></li><?php
+                        $repo->cd($curlink);
+                    ?>-->
+                </ul>
+            </div>
         </div>
     </nav>
     <div id="content" class="demo_class">
