@@ -454,7 +454,7 @@ class BitBucketRepo{
                                     <div class="collapse" id="code<?= $counter ?>">
                                         <div class="well">
                                             <h3>Code</h3>
-                                            <?= nl2br(htmlspecialchars($repo->contents($item))) ?>
+                                            <pre><?= htmlspecialchars($repo->contents($item)) ?></pre>
                                         </div>
                                     </div>
                                     <div class="collapse" id="assets<?= $counter ?>">
