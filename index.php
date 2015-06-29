@@ -199,6 +199,29 @@ class BitBucketRepo{
 
 		return $folder.'/'.$zipname.'.zip';
     }
+    private function deleteDir($dirPath) {
+	    if (substr($dirPath, strlen($dirPath) - 1, 1) != '/') {
+	        $dirPath .= '/';
+	    }
+	    $files = glob($dirPath . '*', GLOB_MARK);
+	    foreach ($files as $file) {
+	        if (is_dir($file)) {
+	            $this->deleteDir($file);
+	        } else {
+	            unlink($file);
+	        }
+	    }
+	    rmdir($dirPath);
+	}
+    public function clearDownloads(){
+        $date = new DateTime();
+        $stamp = $date->getTimestamp();
+    	foreach (glob("download_*") as $filename) {
+    		if(intval(substr($filename, 9)+100) < ($stamp)){
+    			$this->deleteDir($filename);
+    		}
+		}
+    }
     private function fixRelatives($text){
     	$result = $text;
 
@@ -254,18 +277,9 @@ class BitBucketRepo{
 
 		// Start the download function if appropriate:
 		if(isset($_GET['download']) && isset($_POST['downloadpath']) && $_GET['download'] == "TRUE"){
-
-			// Get folder location to download:
 			$file = $repo->getdownload($_POST['downloadpath']);
-
-			// Download folder:
-			header('Content-Disposition: attachment; filename="'.explode('/',$file)[1]."\"");
-	        header('Content-Type: application/zip');
-			header('Content-Length: ' . filesize($file));
-			ob_clean();
-			readfile($file);
-
-			// Delete folder:
+			?><script>window.open('<?= $file ?>', '_blank');</script><?php
+			$repo->clearDownloads();
 		}
 	?>
 	<style>
