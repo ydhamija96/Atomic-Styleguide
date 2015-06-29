@@ -288,7 +288,8 @@ class BitBucketRepo{
     ?>
     <style>
         body > #content > .singleElement > .options{
-            margin-top:20px;
+            border-top:20px solid transparent;
+            clear:left;
         }
         body > #content > .singleElement > .options > form, body > #content > .options > form{
             float:left;
