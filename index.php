@@ -474,8 +474,11 @@ class BitBucketRepo{
                                         <input type="text" name="downloadpath" style="display:none;" value="<?= $repo->pwd().'/'.$item ?>" />
                                         <input type="submit" class="btn" value="Download All Files .zip"></input>
                                     </form>
-                                    <button class="btn" type="button" data-toggle="collapse" data-target="#code<?= $counter ?>" aria-expanded="false" aria-controls="code<?= $counter ?>">
+                                    <button class="btn" type="button" data-toggle="collapse" data-target="#html<?= $counter ?>" aria-expanded="false" aria-controls="html<?= $counter ?>">
                                         See HTML Code
+                                    </button>
+                                    <button class="btn" type="button" data-toggle="collapse" data-target="#css<?= $counter ?>" aria-expanded="false" aria-controls="css<?= $counter ?>">
+                                        See CSS Code
                                     </button>
                                     <button class="btn" type="button" data-toggle="collapse" data-target="#assets<?= $counter ?>" aria-expanded="false" aria-controls="assets<?= $counter ?>">
                                         Download Individual Assets
@@ -483,10 +486,16 @@ class BitBucketRepo{
                                 </div>
                                 <div class="element">
                                     <div class="import"><?php echo $repo->fixedcontents($item); ?></div>
-                                    <div class="collapse" id="code<?= $counter ?>">
+                                    <div class="collapse" id="html<?= $counter ?>">
                                         <div class="well">
                                             <h3>HTML:</h3>
                                             <pre><?= htmlspecialchars($repo->contents($item)) ?></pre>
+                                        </div>
+                                    </div>
+                                    <div class="collapse" id="css<?= $counter ?>">
+                                        <div class="well">
+                                            <h3>CSS:</h3>
+                                            <pre>CSS from the root CSS files will be displayed here, but only the classes/ids relevant to this component. Coming soon.</pre>
                                         </div>
                                     </div>
                                     <div class="collapse" id="assets<?= $counter ?>">
