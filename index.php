@@ -312,6 +312,11 @@ class BitBucketRepo{
             width:80%;
             min-height:300px;
         }
+        body > #content > .singleElement > .element > .import{
+            overflow:hidden;
+            width:100%;
+            margin-bottom:5px;
+        }
         body > #content > .singleElement > .options > form, body > #content > .options > form{
             float:left;
             margin-right:4px;
@@ -477,7 +482,7 @@ class BitBucketRepo{
                                     </button>
                                 </div>
                                 <div class="element">
-                                    <?php echo $repo->fixedcontents($item); ?>
+                                    <div class="import"><?php echo $repo->fixedcontents($item); ?></div>
                                     <div class="collapse" id="code<?= $counter ?>">
                                         <div class="well">
                                             <h3>HTML:</h3>
