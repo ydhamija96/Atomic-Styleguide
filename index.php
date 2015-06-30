@@ -288,8 +288,24 @@ class BitBucketRepo{
     ?>
     <style>
         body > #content > .singleElement > .options{
-            border-top:20px solid transparent;
-            clear:left;
+            display:inline-block;
+            float:left;
+            width:20%;
+            min-width:210px;
+        }
+        body > #content > .singleElement > .options .btn{
+            background: transparent;
+            font-size:1.1em;
+            width:100%;
+            text-align:left;
+        }
+        body > #content > .singleElement > .options h4{
+            color:#220337;
+        }
+        body > #content > .singleElement > .element{
+            display:inline-block;
+            width:80%;
+            min-height:300px;
         }
         body > #content > .singleElement > .options > form, body > #content > .options > form{
             float:left;
@@ -437,29 +453,35 @@ class BitBucketRepo{
                     foreach($repo->ls() as $item){
                         if(!$repo->isDir($item)){
                             ++$counter;
-                            echo '<div class="singleElement">';
-                                echo $repo->fixedcontents($item);
-                                ?>
+                            echo '<div class="singleElement">'; ?>
                                 <div class="options">
+                                    <?php
+                                        $output = substr($item, 0, -5);     // Takes out the .html
+                                        $output = ucwords(str_replace("_", ' ', $output));
+                                    ?>
+                                    <h4><?= $output ?></h4>
                                     <form action="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]&download=TRUE" ?>" method="POST">
                                         <input type="text" name="downloadpath" style="display:none;" value="<?= $repo->pwd().'/'.$item ?>" />
-                                        <input type="submit" class="btn btn-primary" value="Download All Files .zip"></input>
+                                        <input type="submit" class="btn" value="Download All Files .zip"></input>
                                     </form>
-                                    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#code<?= $counter ?>" aria-expanded="false" aria-controls="code<?= $counter ?>">
+                                    <button class="btn" type="button" data-toggle="collapse" data-target="#code<?= $counter ?>" aria-expanded="false" aria-controls="code<?= $counter ?>">
                                         See HTML Code
                                     </button>
-                                    <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#assets<?= $counter ?>" aria-expanded="false" aria-controls="assets<?= $counter ?>">
+                                    <button class="btn" type="button" data-toggle="collapse" data-target="#assets<?= $counter ?>" aria-expanded="false" aria-controls="assets<?= $counter ?>">
                                         Download Individual Assets
                                     </button>
+                                </div>
+                                <div class="element">
+                                    <?php echo $repo->fixedcontents($item); ?>
                                     <div class="collapse" id="code<?= $counter ?>">
                                         <div class="well">
-                                            <h3>Code</h3>
+                                            <h3>HTML:</h3>
                                             <pre><?= htmlspecialchars($repo->contents($item)) ?></pre>
                                         </div>
                                     </div>
                                     <div class="collapse" id="assets<?= $counter ?>">
                                         <div class="well">
-                                            <h3>Assets</h3>
+                                            <h3>Assets:</h3>
                                             <?php
                                                 // Output the root css and js files:
                                                 $oldlocation = $repo->pwd();
