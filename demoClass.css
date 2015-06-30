@@ -1,0 +1,13 @@
+/* Demo class is a class used only by the repository style guide, it's intended to set styles for the repository */
+.demo_class {
+    color: #6d6d6d;
+    font-family: Arial;
+}
+.demo_class .palette, .demo_class .palette_lte {
+    width: 125px;
+    height: 125px;
+    display: inline-block;
+    font-weight: bold;
+    margin-bottom:3px;
+}
+/* end style guide Demo class */

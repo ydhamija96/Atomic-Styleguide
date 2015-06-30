@@ -1,254 +1,15 @@
 <?php
-class BitBucketRepo{
-    private $directoryListing = array();
-    private $parentURL;
-    private $currentLoc = array();
-    function __construct($url){
-        $this->parentURL = $url;
-        $this->directoryListing = $this->getAllContents($this->parentURL, $this->directoryListing);
-    }
-    private function getAllContents($url, $currentDir){
-        $returnValue = file_get_contents($url);
-        $contents = explode("\n", $returnValue);
-        foreach($contents as $content){
-            if(substr($content, -1) == '/'){
-                $currentDir[substr($content, 0, -1)] = array();
-                $currentDir[substr($content, 0, -1)] = $this->getAllContents($url . $content, $currentDir[substr($content, 0, -1)]);
-            }
-            else{
-                $currentDir[$content] = $url.$content;
-            }
-        }
-        return $currentDir;
-    }
-    private function inListing($dirs) {
-        $listing = $this->directoryListing;
-        foreach ($dirs as $dir) {
-            if (array_key_exists($dir, $listing) && is_array($listing[$dir])) {
-                $listing = $listing[$dir];
-            }
-            else{
-                return false;
-            }
-        }
-        return true;
-    }
-    public function pwd(){
-        return '/'.implode('/', $this->currentLoc);
-    }
-    public function cd($loc){
-        if($loc == '/'){
-            $this->currentLoc = array();
-            return $this;
-        }
-        $loc = (strlen($loc) > 1) ? rtrim($loc, '/') : $loc;
-        $loc = explode('/', $loc);
-        if($loc[0] == ''){
-            $this->currentLoc = array_slice($loc, 1);
-            foreach($this->currentLoc as $i => $dir){
-                if($dir == '..'){
-                    array_splice($this->currentLoc, $i-1, 2);
-                }
-            }
-        }
-        else{
-            $this->currentLoc = array_merge($this->currentLoc, $loc);
-            foreach($this->currentLoc as $i => $dir){
-                if($dir == '..'){
-                    array_splice($this->currentLoc, $i-1, 2);
-                }
-            }
-        }
-        if(!$this->inListing($this->currentLoc)){
-            $this->cd('..');
-        }
-        return $this;
-    }
-    public function ls($all = true, $recursive = false){
-        $listing = $this->directoryListing;
-        $result = array();
-        foreach ($this->currentLoc as $dir) {
-            $listing = $listing[$dir];
-        }
-        foreach($listing as $key => $item){
-            if(is_array($item)){
-                if($recursive){
-                    $oldlocation = $this->pwd();
-                    $this->cd($key);
-                    $additionalResults = $this->ls($all, true);
-                    foreach($additionalResults as $single){
-                        $single = $key.'/'.$single;
-                        $result[] = $single;
-                    }
-                    $this->cd($oldlocation);
-                }
-                else{
-                    $result[] = $key.'/';
-                }
-            }
-            elseif($all){
-                $result[] = $key;
-            }
-        }
-        return $result;
-    }
-    public function link($path){
-        if($path[0] == '/'){
-            return (rtrim($this->parentURL, '/') . '/' . ltrim($path, '/'));
-        }
-        else{
-            return (rtrim($this->parentURL, '/') . '/' . ((count($this->currentLoc) > 0) ? trim(implode('/', $this->currentLoc), '/') . '/' : '') . ltrim($path, '/'));
-        }
-    }
-    public function contents($path){
-        return file_get_contents($this->link($path));
-    }
-    public function currentDir(){
-        return end(array_values($this->currentLoc));
-    }
-    public function isDir($path){
-        $old = $this->pwd();
-        $this->cd($path);
-        $result = (end(array_values($this->currentLoc)) == rtrim($path, '/'));
-        $this->cd($old);
-        return $result;
-    }
-    private function copyToServer($item){
-        // Create a directory:
-        $date = new DateTime();
-        $stamp = $date->getTimestamp();
-        $rootname = "download_".$stamp;
-        mkdir($rootname);
-        
-        // Get name of file to be downloaded:
-        $filename = explode('/', $item);
-        $filename = end(array_values($filename));
-        
-        // Create a directory and put the actual item in it:
-        $foldername = substr($filename, 0, -5);    // Takes out the .html
-        mkdir($rootname.'/'.$foldername);
-        file_put_contents($rootname.'/'.$foldername.'/'.$filename, $this->contents($item));
-        
-        // Put root .css and .js in it:
-        $oldlocation = $this->pwd();
-        $this->cd('/');
-        foreach($this->ls() as $file){
-            if(!$this->isDir($file)){
-                if(substr($file, -3) == '.js' || substr($file, -4) == '.css'){
-                    file_put_contents($rootname.'/'.$foldername.'/'.$file, $this->contents($file));
-                }
-            }
-        }
-        $this->cd($oldlocation);
-        
-        // Copy any assets:
-        $oldlocation = $this->pwd();
-        $this->cd($item);
-        foreach($this->ls(false) as $asset){
-            //if($asset == 'assets_'.$foldername.'/'){      // Store each template/component assets in a separate folder (assets_templateOrComponentName)?
-                $this->getFolder($this->pwd().'/'.$asset, $rootname.'/'.$foldername);
-            //}
-        }
-        $this->cd($oldlocation);
-        
-        return $rootname;
-    }
-    private function getFolder($folderToGet, $whereToPutIt){
-        // Find out what to name directory:
-        $foldername = explode('/', rtrim($folderToGet, '/'));
-        $foldername = end(array_values($foldername));
-        
-        // Create directory:
-        mkdir($whereToPutIt.'/'.$foldername);
-        
-        // Copy everything:
-        $oldlocation = $this->pwd();
-        $this->cd($folderToGet);
-        foreach($this->ls() as $item){
-            if($this->isDir($item)){    // Copy folders
-                $this->getFolder($item, $whereToPutIt.'/'.$foldername);
-            }
-            else{   // Copy files
-                file_put_contents($whereToPutIt.'/'.$foldername.'/'.$item, $this->contents($item));
-            }
-        }
-        $this->cd($oldlocation);
-    }
-    public function getDownload($item){
-        $folder = $this->copyToServer($item);
-        $zipname = explode('/', glob($folder.'/*')[0])[1];
-
-        // Zip up the folder inside $folder:
-        $rootPath = realpath($folder.'/'.$zipname);
-        $zip = new ZipArchive();
-        $zip->open($folder.'/'.$zipname.'.zip', ZipArchive::CREATE | ZipArchive::OVERWRITE);
-        $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($rootPath),
-            RecursiveIteratorIterator::LEAVES_ONLY
-        );
-        foreach ($files as $name => $file)
-        {
-            if (!$file->isDir())
-            {
-                $filePath = $file->getRealPath();
-                $relativePath = substr($filePath, strlen($rootPath) + 1);
-                $zip->addFile($filePath, $relativePath);
-            }
-        }
-        $zip->close();
-
-        return $folder.'/'.$zipname.'.zip';
-    }
-    private function deleteDir($dirPath) {
-        if (substr($dirPath, strlen($dirPath) - 1, 1) != '/') {
-            $dirPath .= '/';
-        }
-        $files = glob($dirPath . '*', GLOB_MARK);
-        foreach ($files as $file) {
-            if (is_dir($file)) {
-                $this->deleteDir($file);
-            } else {
-                unlink($file);
-            }
-        }
-        rmdir($dirPath);
-    }
-    public function clearDownloads($seconds){
-        $date = new DateTime();
-        $stamp = $date->getTimestamp();
-        foreach (glob("download_*") as $filename) {
-            if(intval(substr($filename, 9)+$seconds) < ($stamp)){
-                $this->deleteDir($filename);
-            }
-        }
-    }
-    private function fixRelatives($text){
-        // Find all relative URLs
-        $patterns = ['/((?:src|href)\s*=\s*(["\']))(\s*(?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.).+?\2)/i', '/(url\s*\(\s*(["\'])\s*)((?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.).*?\s*\2\))/i'];
-        
-        // Calculate what to prepend
-        $prepend = $this->pwd();
-        $prepend = trim($prepend, '/');
-        $prepend = $this->parentURL . $prepend . '/';
-
-        // Run the regex
-        $result = preg_replace($patterns, '${1}'.$prepend.'${3}' , $text);
-
-        return $result;
-    }
-    public function fixedcontents($path){
-        return $this->fixRelatives($this->contents($path));
-    }
-}
+    session_start();
+    require_once('BitBucketRepo.php');
 ?>
-
-<?php session_start(); ?>
 <!DOCTYPE html>
 <html>
 
 <head>
     <title>NYU Atomic Styleguide</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="demoClass.css">
     <?php
         // Start repo:
         if(isset($_SESSION['repo'])){
@@ -286,72 +47,6 @@ class BitBucketRepo{
             $repo->clearDownloads(100);
         }
     ?>
-    <style>
-        body > #content > .singleElement > .options{
-            display:inline-block;
-            float:left;
-            width:20%;
-            min-width:210px;
-            margin-bottom:20px;
-        }
-        body > #content > .options{
-            margin-bottom:20px;
-            height:70px;
-        }
-        body > #content > .singleElement > .options .btn{
-            background: transparent;
-            font-size:1.1em;
-            width:100%;
-            text-align:left;
-        }
-        body > #content .options h4{
-            color:#220337;
-        }
-        body > #content > .singleElement > .element{
-            display:inline-block;
-            width:80%;
-            min-height:300px;
-        }
-        body > #content > .singleElement > .element > .import{
-            overflow:hidden;
-            width:100%;
-            margin-bottom:5px;
-        }
-        body > #content > .singleElement > .options > form, body > #content > .options > form{
-            float:left;
-            margin-right:4px;
-        }
-        body > #content > .singleElement{
-            margin-bottom:75px;
-        }
-        body > #content{
-            width:100%;
-            max-width:1170px;
-            padding:15px;
-            margin:auto;
-            margin-top:75px;
-        }
-        body > #content > .singleElement > .options > .collapse > .well, body > #content > .singleElement > .options > .collapsing > .well{
-            margin-top:5px;
-            margin-bottom:5px;
-        }
-        body > #content > .singleElement > .options > .collapse > .well > h3, body > #content > .singleElement > .options > .collapsing > .well > h3{
-            margin-top:-3px;
-        }
-        /* Demo class is a class used only by the repository style guide, it's intended to set styles for the repository */
-        .demo_class {
-            color: #6d6d6d;
-            font-family: Arial;
-        }
-        .demo_class .palette, .demo_class .palette_lte {
-            width: 125px;
-            height: 125px;
-            display: inline-block;
-            font-weight: bold;
-            margin-bottom:3px;
-        }
-        /* end style guide Demo class */
-    </style>
 </head>
 
 <body>
@@ -472,13 +167,13 @@ class BitBucketRepo{
                                     <h4><?= $output ?></h4>
                                     <form action="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]&download=TRUE" ?>" method="POST">
                                         <input type="text" name="downloadpath" style="display:none;" value="<?= $repo->pwd().'/'.$item ?>" />
-                                        <input type="submit" class="btn" value="Download All Files .zip"></input>
+                                        <input type="submit" class="btn" value="Download Files .zip"></input>
                                     </form>
                                     <button class="btn" type="button" data-toggle="collapse" data-target="#html<?= $counter ?>" aria-expanded="false" aria-controls="html<?= $counter ?>">
-                                        See HTML Code
+                                        See the HTML
                                     </button>
                                     <button class="btn" type="button" data-toggle="collapse" data-target="#css<?= $counter ?>" aria-expanded="false" aria-controls="css<?= $counter ?>">
-                                        See CSS Code
+                                        See the CSS
                                     </button>
                                     <button class="btn" type="button" data-toggle="collapse" data-target="#assets<?= $counter ?>" aria-expanded="false" aria-controls="assets<?= $counter ?>">
                                         Download Individual Assets
@@ -495,7 +190,29 @@ class BitBucketRepo{
                                     <div class="collapse" id="css<?= $counter ?>">
                                         <div class="well">
                                             <h3>CSS:</h3>
-                                            <pre>CSS from the root CSS files will be displayed here, but only the classes/ids relevant to this component. Coming soon.</pre>
+                                            <?php 
+                                                $tags = $repo->findselectors($repo->contents($item));
+                                                echo "<pre>";
+                                                    foreach($tags['classes'] as $class){
+                                                        foreach($repo->filtercss('class', $class) as $item){
+                                                            echo $item;
+                                                            echo "\n";
+                                                        }
+                                                    }
+                                                    foreach($tags['ids'] as $id){
+                                                        foreach($repo->filtercss('id', $id) as $item){
+                                                            echo $item;
+                                                            echo "\n";
+                                                        }
+                                                    }
+                                                    foreach($tags['tags'] as $tag){
+                                                        foreach($repo->filtercss('tag', $tag) as $item){
+                                                            echo $item;
+                                                            echo "\n";
+                                                        }
+                                                    }
+                                                echo "</pre>";
+                                            ?>
                                         </div>
                                     </div>
                                     <div class="collapse" id="assets<?= $counter ?>">

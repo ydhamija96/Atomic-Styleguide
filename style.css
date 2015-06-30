@@ -1,0 +1,48 @@
+body > #content > .singleElement > .options{
+    display:inline-block;
+    float:left;
+    width:20%;
+    min-width:210px;
+    margin-bottom:20px;
+}
+body > #content > .options{
+    margin-bottom:20px;
+    height:70px;
+}
+body > #content > .singleElement > .options .btn{
+    background: transparent;
+    font-size:1.1em;
+    width:100%;
+    text-align:left;
+}
+body > #content > .singleElement > .element{
+    display:inline-block;
+    width:80%;
+    min-height:300px;
+}
+body > #content > .singleElement > .element > .import{
+    overflow:hidden;
+    width:100%;
+    margin-bottom:5px;
+}
+body > #content > .singleElement > .options > form, body > #content > .options > form{
+    float:left;
+    margin-right:4px;
+}
+body > #content > .singleElement{
+    margin-bottom:75px;
+}
+body > #content{
+    width:100%;
+    max-width:1170px;
+    padding:15px;
+    margin:auto;
+    margin-top:75px;
+}
+body > #content > .singleElement > .options > .collapse > .well, body > #content > .singleElement > .options > .collapsing > .well{
+    margin-top:5px;
+    margin-bottom:5px;
+}
+body > #content > .singleElement > .options > .collapse > .well > h3, body > #content > .singleElement > .options > .collapsing > .well > h3{
+    margin-top:-3px;
+}
