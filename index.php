@@ -294,13 +294,17 @@ class BitBucketRepo{
             min-width:210px;
             margin-bottom:20px;
         }
+        body > #content > .options{
+            margin-bottom:20px;
+            height:70px;
+        }
         body > #content > .singleElement > .options .btn{
             background: transparent;
             font-size:1.1em;
             width:100%;
             text-align:left;
         }
-        body > #content > .singleElement > .options h4{
+        body > #content .options h4{
             color:#220337;
         }
         body > #content > .singleElement > .element{
@@ -536,14 +540,20 @@ class BitBucketRepo{
             else{   // If a single file is specified in the URL
 
                 // Display the single item
-                echo $repo->fixedcontents($path);
                 ?>
-                    <div class="options">
-                        <form action="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]&download=TRUE" ?>" method="POST">
-                            <input type="text" name="downloadpath" style="display:none;" value="<?= $path ?>" />
-                            <input type="submit" class="btn btn-primary" value="Download"></input>
-                        </form>
-                    </div>
+                <div class="options">
+                    <?php
+                        $output = ucwords(preg_replace('/.*\/(.+)\.html/i', '${1}', str_replace('_', ' ', $path)));
+                    ?>
+                    <h4><?= $output ?></h4>
+                    <form action="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]&download=TRUE" ?>" method="POST">
+                        <input type="text" name="downloadpath" style="display:none;" value="<?= $path ?>" />
+                        <input type="submit" class="btn" value="Download .zip"></input>
+                    </form>
+                </div>
+                <div class="element">
+                    <?php echo $repo->fixedcontents($path); ?>
+                </div>
                 <?php
             }
         ?>
