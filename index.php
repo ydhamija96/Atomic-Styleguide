@@ -185,30 +185,37 @@
                                         <div class="well">
                                             <h3>HTML:</h3>
                                             <pre><?= htmlspecialchars($repo->contents($item)) ?></pre>
+                                            <?php 
+                                                $html=$repo->contents($item);   // Used later to show assets only applicable to this HTML
+                                            ?>
                                         </div>
                                     </div>
                                     <div class="collapse" id="css<?= $counter ?>">
                                         <div class="well">
                                             <h3>CSS:</h3>
                                             <?php 
+                                                $css = '';  // Used later to show assets only applicable to this CSS
                                                 $tags = $repo->findselectors($repo->contents($item));
                                                 echo "<pre>";
                                                     foreach($tags['classes'] as $class){
                                                         foreach($repo->filtercss('class', $class) as $section){
                                                             echo $section;
                                                             echo "\n";
+                                                            $css .= $section;
                                                         }
                                                     }
                                                     foreach($tags['ids'] as $id){
                                                         foreach($repo->filtercss('id', $id) as $section){
                                                             echo $section;
                                                             echo "\n";
+                                                            $css .= $section;
                                                         }
                                                     }
                                                     foreach($tags['tags'] as $tag){
                                                         foreach($repo->filtercss('tag', $tag) as $section){
                                                             echo $section;
                                                             echo "\n";
+                                                            $css .= $section;
                                                         }
                                                     }
                                                 echo "</pre>";
@@ -239,8 +246,9 @@
                                                     //if($folder == 'assets_'.$item.'/'){      // Store each template/component assets in a separate folder (assets_templateOrComponentName)?
                                                         $oldlocation = $repo->pwd();
                                                         $repo->cd($folder);
-                                                        foreach($repo->ls(true, true) as $item){
-                                                            ?><a href="<?= $repo->link($item) ?>" download="<?= $item ?>"><?= $item ?></a><br /><?php
+                                                        $assets = $repo->findassets($html.'|'.$css);
+                                                        foreach($assets as $asset){
+                                                            ?><a href="<?= $repo->link($asset) ?>" download="<?= $asset ?>"><?= $asset ?></a><br /><?php
                                                         }
                                                         $repo->cd($oldlocation);
                                                     //}

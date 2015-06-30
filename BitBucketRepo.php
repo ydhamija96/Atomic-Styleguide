@@ -294,5 +294,24 @@ class BitBucketRepo{
             return $results[0];
         }
     }
+    public function findassets($text){   // Searches given text for any references to current folder
+        preg_match_all('/'.$this->currentDir().'\/(.*?)[\'"]/is', $text, $results);
+        $assets = $results[1];
+
+        // Find any .psd's in the folder.
+        foreach($results[1] as $asset){
+            $temp = explode('/', $asset);
+            $temp = end(array_values($temp));
+            $temp = explode('.', $temp);
+            array_pop($temp);
+            $name = implode('.', $temp);
+            foreach($this->ls(true, true) as $item){
+                if(strtolower(substr($item, -4)) == '.psd' && strpos($item, $name) !== false){
+                    $assets[] = $item;
+                }
+            }
+        }
+        return $assets;
+    }
 }
 ?>
