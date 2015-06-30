@@ -9,11 +9,17 @@ body > #content > .options{
     margin-bottom:20px;
     height:70px;
 }
-body > #content > .singleElement > .options .btn{
+body > #content > .singleElement > .options > form{
+    width:100%;
+}
+body > #content > .singleElement > .options > .btn, body > #content > .singleElement > .options > form > .btn{
     background: transparent;
     font-size:1.1em;
     width:100%;
     text-align:left;
+}
+body > #content > .singleElement > .options > form > .btn{
+    font-style:italic;
 }
 body > #content > .singleElement > .element{
     display:inline-block;
@@ -39,10 +45,9 @@ body > #content{
     margin:auto;
     margin-top:75px;
 }
-body > #content > .singleElement > .options > .collapse > .well, body > #content > .singleElement > .options > .collapsing > .well{
-    margin-top:5px;
-    margin-bottom:5px;
+body > #content > .singleElement > .element > .collapse pre{
+    font-size:11px;
 }
-body > #content > .singleElement > .options > .collapse > .well > h3, body > #content > .singleElement > .options > .collapsing > .well > h3{
-    margin-top:-3px;
+body > #content > .singleElement > .element > .collapsing pre{
+    font-size:11px;
 }
