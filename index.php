@@ -194,20 +194,20 @@
                                                 $tags = $repo->findselectors($repo->contents($item));
                                                 echo "<pre>";
                                                     foreach($tags['classes'] as $class){
-                                                        foreach($repo->filtercss('class', $class) as $item){
-                                                            echo $item;
+                                                        foreach($repo->filtercss('class', $class) as $section){
+                                                            echo $section;
                                                             echo "\n";
                                                         }
                                                     }
                                                     foreach($tags['ids'] as $id){
-                                                        foreach($repo->filtercss('id', $id) as $item){
-                                                            echo $item;
+                                                        foreach($repo->filtercss('id', $id) as $section){
+                                                            echo $section;
                                                             echo "\n";
                                                         }
                                                     }
                                                     foreach($tags['tags'] as $tag){
-                                                        foreach($repo->filtercss('tag', $tag) as $item){
-                                                            echo $item;
+                                                        foreach($repo->filtercss('tag', $tag) as $section){
+                                                            echo $section;
                                                             echo "\n";
                                                         }
                                                     }
