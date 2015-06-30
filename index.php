@@ -292,6 +292,7 @@ class BitBucketRepo{
             float:left;
             width:20%;
             min-width:210px;
+            margin-bottom:20px;
         }
         body > #content > .singleElement > .options .btn{
             background: transparent;
