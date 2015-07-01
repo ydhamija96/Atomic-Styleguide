@@ -1,5 +1,5 @@
 body{
-    background-image: url(http://www.transparenttextures.com/patterns/black-linen-2.png);
+    background: #CCCCCC;
 }
 body > #content > .singleElement > .options{
     display:inline-block;
