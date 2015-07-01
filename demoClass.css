@@ -9,8 +9,5 @@
     display: inline-block;
     font-weight: bold;
     margin-bottom:4px;
-    -webkit-border-radius: 5px;
-	-moz-border-radius: 5px;
-	border-radius: 5px;
 }
 /* end style guide Demo class */
