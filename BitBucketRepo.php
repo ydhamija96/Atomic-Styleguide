@@ -322,14 +322,17 @@ class BitBucketRepo{
         $text = $this->getcss();
         if($type == 'class'){
             preg_match_all('/\.'.$name.'.*?{.*?}/is', $text, $results);
+            $results[0] = preg_replace('/,.*?{/is',' {', $results[0]);
             return $results[0];
         }
         if($type == 'id'){
             preg_match_all('/#'.$name.'.*?{.*?}/is', $text, $results);
+            $results[0] = preg_replace('/,.*?{/is',' {', $results[0]);
             return $results[0];
         }
         if($type == 'tag'){
             preg_match_all('/\b'.$name.'.*?{.*?}/is', $text, $results);
+            $results[0] = preg_replace('/,.*?{/is',' {', $results[0]);
             return $results[0];
         }
     }
