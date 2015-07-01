@@ -178,7 +178,7 @@
                                     <div class="import"><?php echo $repo->fixedcontents($item); ?></div>
                                     <div class="collapse" id="html<?= $counter ?>">
                                         <div class="well">
-                                            <h3>HTML:</h3>
+                                            <h5>HTML:</h5>
                                             <pre><code class='html'><?= htmlspecialchars($repo->contents($item)) ?></code></pre>
                                             <?php 
                                                 $html=$repo->contents($item);   // Used later to show assets only applicable to this HTML
@@ -187,7 +187,7 @@
                                     </div>
                                     <div class="collapse" id="css<?= $counter ?>">
                                         <div class="well">
-                                            <h3>CSS:</h3>
+                                            <h5>CSS:</h5>
                                             <?php 
                                                 $css = '';  // Used later to show assets only applicable to this CSS
                                                 $tags = $repo->findselectors($repo->contents($item));
@@ -219,7 +219,7 @@
                                     </div>
                                     <div class="collapse" id="assets<?= $counter ?>">
                                         <div class="well">
-                                            <h3>Assets:</h3>
+                                            <h5>Assets:</h5>
                                             <?php
                                                 // Output the root css and js files:
                                                 $oldlocation = $repo->pwd();

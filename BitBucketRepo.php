@@ -338,7 +338,7 @@ class BitBucketRepo{
         preg_match_all('/'.$this->currentDir().'\/(.*?)[\'"]/is', $text, $results);
         //$assets = $results[1];
 
-        // Find any other files (pdf's, ttf's that might be relevant) in the folder.
+        // Find any relevant files in the folder.
         foreach($results[1] as $asset){
             $temp = explode('/', $asset);
             $temp = end(array_values($temp));
