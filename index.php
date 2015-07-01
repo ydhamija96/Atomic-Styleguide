@@ -20,14 +20,7 @@
         }
 
         // Output CSS inline:
-        $repo->cd('/');
-        foreach($repo->ls() as $file){
-            if(!$repo->isDir($file)){
-                if(substr($file, -4) == '.css'){
-                    ?><style><?= $repo->fixedcontents($file) ?></style><?php
-                }
-            }
-        }
+        ?><style><?= $repo->getcss() ?></style><?php
 
         // Traverse the repo to proper location:
         if(isset($_GET['path']) && trim($_GET['path']) != ''){

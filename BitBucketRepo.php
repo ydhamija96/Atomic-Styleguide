@@ -262,7 +262,7 @@ class BitBucketRepo{
         return array('classes' => $classes, 'ids' => $ids, 'tags' => $tags);
     }
     private $mainCSS = 0;
-    private function getcss(){
+    public function getcss(){
         if($this->mainCSS === 0){
             $text = '';
             $old = $this->pwd();
