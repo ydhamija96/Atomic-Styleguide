@@ -171,7 +171,7 @@
                                         See the CSS
                                     </button>
                                     <button class="btn" type="button" data-toggle="collapse" data-target="#assets<?= $counter ?>" aria-expanded="false" aria-controls="assets<?= $counter ?>">
-                                        Download Individual Assets
+                                        Download Individual Files
                                     </button>
                                 </div>
                                 <div class="element">
