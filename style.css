@@ -28,6 +28,7 @@ body > #content > .singleElement > .options > .btn, body > #content > .singleEle
 }
 body > #content > .singleElement > .options > form > .btn{
     font-style:italic;
+    font-weight:bold;
 }
 body > #content > .singleElement > .element{
     display:inline-block;
@@ -61,6 +62,7 @@ body > #content{
 body > #content > .options > form > .btn{
     background:white;
     font-style:italic;
+    font-weight:bold;
 }
 body > #content > #homeContent{
     max-width:1170px;

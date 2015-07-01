@@ -292,6 +292,7 @@
                                     <li>Store any dependencies in folders in the <i>same location</i> where the template/component is. From there, we'll find 'em.</li>
                                 </ul>
                                 And that's it! We take care of the rest.
+                            </p>
                         </div>
                     <?php                    
                 }
