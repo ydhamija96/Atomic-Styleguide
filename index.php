@@ -236,13 +236,15 @@
 
                                                 // Output any assets:
                                                 foreach($repo->ls(false) as $folder){
-                                                        $oldlocation = $repo->pwd();
-                                                        $repo->cd($folder);
-                                                        $assets = $repo->findassets($html.'|'.$css);
-                                                        foreach($assets as $asset){
-                                                            ?><a href="<?= $repo->link($asset) ?>" download="<?= $asset ?>"><?= $asset ?></a><br /><?php
-                                                        }
-                                                        $repo->cd($oldlocation);
+                                                    $oldlocation = $repo->pwd();
+                                                    $repo->cd($folder);
+                                                    $assets = $repo->findassets($html.'|'.$css);
+                                                    foreach($assets as $asset){
+                                                        $output = explode('/', $asset);
+                                                        $output = end(array_values($output));
+                                                        ?><a href="<?= $repo->link($asset) ?>" download="<?= $asset ?>"><?= $output ?></a><br /><?php
+                                                    }
+                                                    $repo->cd($oldlocation);
                                                 }
                                             ?>
                                         </div>
