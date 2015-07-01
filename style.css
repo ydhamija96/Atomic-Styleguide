@@ -1,3 +1,6 @@
+body{
+    background-image: url(http://www.transparenttextures.com/patterns/black-linen-2.png);
+}
 body > #content > .singleElement > .options{
     display:inline-block;
     float:left;
@@ -7,7 +10,12 @@ body > #content > .singleElement > .options{
 }
 body > #content > .options{
     margin-bottom:20px;
-    height:70px;
+    height:120px;
+    padding:20px;
+    background:white;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
 }
 body > #content > .singleElement > .options > form{
     width:100%;
@@ -36,7 +44,12 @@ body > #content > .singleElement > .options > form, body > #content > .options >
     margin-right:4px;
 }
 body > #content > .singleElement{
-    margin-bottom:75px;
+    margin-bottom:25px;
+    padding:20px;
+    background:white;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
 }
 body > #content{
     width:100%;
@@ -44,6 +57,28 @@ body > #content{
     padding:15px;
     margin:auto;
     margin-top:75px;
+}
+body > #content > .options > form > .btn{
+    background:white;
+    font-style:italic;
+}
+body > #content > #homeContent{
+    max-width:1170px;
+    margin:auto;
+    padding:20px;
+    padding-left:60px;
+    padding-right:60px;
+    background:white;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;  
+}
+body > #content > .element{
+    padding:20px;
+    background:white;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;    
 }
 body > #content > .singleElement > .element > .collapse pre{
     font-size:11px;

@@ -45,7 +45,7 @@
 </head>
 
 <body>
-    <nav class="navbar navbar-inverse navbar-fixed-top">
+    <nav class="navbar navbar-default navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
@@ -267,7 +267,7 @@
                 }
                 elseif($repo->pwd() == '/'){   // If at document root.
                     ?>
-                        <div id="homeContent" style="max-width:600px;margin:auto;">
+                        <div id="homeContent">
                             <h2>Welcome...</h2>
                             <h4>...to the Atomic Style Guide! :)</h4><br />
                             <h5>Here's what we do:</h5>
