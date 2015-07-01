@@ -265,9 +265,39 @@
                     print_r($repo->ls());
                     echo "</pre>";
                 }
+                elseif($repo->pwd() == '/'){   // If at document root.
+                    ?>
+                        <div id="homeContent" style="max-width:600px;margin:auto;">
+                            <h2>Welcome...</h2>
+                            <h4>...to the Atomic Style Guide! :)</h4><br />
+                            <h5>Here's what we do:</h5>
+                            <p>
+                                In atomic designs (designs that are broken down into individual components/templates), 
+                                we are the style guide. We will display each component, show its HTML 
+                                and CSS code, and allow it (and each or all of its dependencies) to be downloaded at the click of
+                                a button.<br /><br />
+                                Each element is directly accessed from where it is stored, so there is no updating
+                                or CMS to worry about. We will always display the latest and greatest version of every element.
+                            </p><br /><br />
+                            <h5>Here's how to use us:</h5>
+                            <p>
+                                Just create a public BitBucket repository (support for private ones is coming soon), store your design
+                                elements in there, and we'll take care of the rest. <br /><br />
+                                Just follow this simple structure:<br />
+                                <ul>
+                                    <li>Store your master .css and .js file(s) in the root directory.</li>
+                                    <li>Store your single components in a 'components' folder in the root directory.</li> 
+                                    <li>If you'd like to break components into sections, put them in subdirectories inside the 'components' folder.</li>
+                                    <li>Store your templates in a 'templates' folder in the root directory.</li>
+                                    <li>Store any dependencies in folders in the <i>same location</i> where the template/component is. From there, we'll find 'em.</li>
+                                </ul>
+                                And that's it! We take care of the rest.
+                        </div>
+                    <?php                    
+                }
                 else{   // If in some other root dir.
                     echo "<pre>" . $repo->pwd() . ":<br>";
-                    print_r($repo->ls());
+                    print_r($repo->ls(true, true));
                     echo "</pre>";
                 }
             }
