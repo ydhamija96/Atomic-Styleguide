@@ -6,10 +6,12 @@
 <html>
 
 <head>
-    <title>NYU Atomic Styleguide</title>
+    <title>Atomic Styleguide</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="style.css">
     <link rel="stylesheet" type="text/css" href="demoClass.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/default.min.css"><!-- No idea if licensing allows this. -->
+    <link rel="stylesheet" href="https://highlightjs.org/static/styles/github.css"><!-- No idea if licensing allows this. -->
     <?php
         // Start repo:
         if(isset($_SESSION['repo'])){
@@ -52,7 +54,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="?">Style Guide</a>
+                <a class="navbar-brand" href="?">Atomic Style Guide</a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
@@ -177,7 +179,7 @@
                                     <div class="collapse" id="html<?= $counter ?>">
                                         <div class="well">
                                             <h3>HTML:</h3>
-                                            <pre><?= htmlspecialchars($repo->contents($item)) ?></pre>
+                                            <pre><code class='html'><?= htmlspecialchars($repo->contents($item)) ?></code></pre>
                                             <?php 
                                                 $html=$repo->contents($item);   // Used later to show assets only applicable to this HTML
                                             ?>
@@ -189,7 +191,7 @@
                                             <?php 
                                                 $css = '';  // Used later to show assets only applicable to this CSS
                                                 $tags = $repo->findselectors($repo->contents($item));
-                                                echo "<pre>";
+                                                echo "<pre><code class='css'>";
                                                     foreach($tags['classes'] as $class){
                                                         foreach($repo->filtercss('class', $class) as $section){
                                                             echo $section;
@@ -211,7 +213,7 @@
                                                             $css .= $section;
                                                         }
                                                     }
-                                                echo "</pre>";
+                                                echo "</code></pre>";
                                             ?>
                                         </div>
                                     </div>
@@ -308,6 +310,8 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script><!-- No idea if licensing allows this. -->
+    <script>hljs.initHighlightingOnLoad();</script>
 </body>
 
 </html>
