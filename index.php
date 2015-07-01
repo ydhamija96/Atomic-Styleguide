@@ -8,6 +8,7 @@
 <head>
     <title>Atomic Styleguide</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="style.css">
     <link rel="stylesheet" type="text/css" href="demoClass.css">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/default.min.css"><!-- No idea if licensing allows this. -->
@@ -165,13 +166,13 @@
                                         <input type="submit" class="btn" value="Download Files .zip"></input>
                                     </form>
                                     <button class="btn" type="button" data-toggle="collapse" data-target="#html<?= $counter ?>" aria-expanded="false" aria-controls="html<?= $counter ?>">
-                                        See the HTML
+                                        <i class="fa fa-html5 fa-fw"></i> See the HTML
                                     </button>
                                     <button class="btn" type="button" data-toggle="collapse" data-target="#css<?= $counter ?>" aria-expanded="false" aria-controls="css<?= $counter ?>">
-                                        See the CSS
+                                        <i class="fa fa-css3 fa-fw"></i> See the CSS
                                     </button>
                                     <button class="btn" type="button" data-toggle="collapse" data-target="#assets<?= $counter ?>" aria-expanded="false" aria-controls="assets<?= $counter ?>">
-                                        Download Individual Files
+                                        <i class="fa fa-download fa-fw"></i> Download Individual Files
                                     </button>
                                 </div>
                                 <div class="element">
