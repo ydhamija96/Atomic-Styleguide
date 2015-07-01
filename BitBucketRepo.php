@@ -144,14 +144,53 @@ class BitBucketRepo{
         // Copy any assets:
         $oldlocation = $this->pwd();
         $this->cd($item);
-        foreach($this->ls(false) as $asset){
-            //if($asset == 'assets_'.$foldername.'/'){      // Store each template/component assets in a separate folder (assets_templateOrComponentName)?
-                $this->getFolder($this->pwd().'/'.$asset, $rootname.'/'.$foldername);
-            //}
+        $html = $this->contents($item);
+        //Get CSS for just that file:
+        $css = '';
+        $tags = $this->findselectors($html);
+        //Get CSS classes:
+        foreach($tags['classes'] as $class){
+            foreach($this->filtercss('class', $class) as $section){
+                $css .= $section;
+            }
+        }
+        //Get CSS ids:
+        foreach($tags['ids'] as $id){
+            foreach($this->filtercss('id', $id) as $section){
+                $css .= $section;
+            }
+        }
+        //Get CSS tags:
+        foreach($tags['tags'] as $tag){
+            foreach($this->filtercss('tag', $tag) as $section){
+                $css .= $section;
+            }
+        }
+        //Finally, copy the assets:
+        foreach($this->ls(false) as $folder){
+            $old = $this->pwd();
+            $this->cd($folder);
+            $assets = $this->findassets($html.'|'.$css);
+            foreach($assets as $asset){
+                $this->file_force_contents($rootname.'/'.$foldername.'/'.$folder.$asset, $this->contents($asset));
+            }
+            $this->cd($old);
         }
         $this->cd($oldlocation);
         
         return $rootname;
+    }
+    private function file_force_contents($dir, $contents){
+        $parts = explode('/', $dir);
+        $file = array_pop($parts);
+        $dir = '';
+        foreach($parts as $part){
+            $dir .= $part.'/';
+            if(!is_dir($dir)){
+                mkdir($dir);
+            }
+        }
+        file_put_contents("$dir/$file", $contents);
     }
     private function getFolder($folderToGet, $whereToPutIt){
         // Find out what to name directory:

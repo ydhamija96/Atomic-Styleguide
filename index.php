@@ -236,7 +236,6 @@
 
                                                 // Output any assets:
                                                 foreach($repo->ls(false) as $folder){
-                                                    //if($folder == 'assets_'.$item.'/'){      // Store each template/component assets in a separate folder (assets_templateOrComponentName)?
                                                         $oldlocation = $repo->pwd();
                                                         $repo->cd($folder);
                                                         $assets = $repo->findassets($html.'|'.$css);
@@ -244,7 +243,6 @@
                                                             ?><a href="<?= $repo->link($asset) ?>" download="<?= $asset ?>"><?= $asset ?></a><br /><?php
                                                         }
                                                         $repo->cd($oldlocation);
-                                                    //}
                                                 }
                                             ?>
                                         </div>
