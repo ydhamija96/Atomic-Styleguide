@@ -23,7 +23,7 @@
         }
 
         // Output CSS inline:
-        ?><style><?= $repo->getcss() ?></style><?php
+        ?><style><?= $repo->getcss(true) ?></style><?php
 
         // Traverse the repo to proper location:
         if(isset($_GET['path']) && trim($_GET['path']) != ''){
@@ -64,40 +64,43 @@
                         // Display all directories in bitbucket root:
                         $current = $repo->pwd();
                         $repo->cd('/');
-                        foreach($repo->ls(false) as $dir): ?>
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?= ucfirst(rtrim($dir, '/')) ?><span class="caret"></span></a>
-                                <ul class="dropdown-menu">
-                                    <?php 
+                        foreach($repo->ls(false) as $dir): 
+                            // Ignore everything that's not components or templates
+                            if(strtolower($dir) == "components/" || strtolower($dir) == "templates/"): ?>
+                                <li class="dropdown">
+                                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?= ucfirst(rtrim($dir, '/')) ?><span class="caret"></span></a>
+                                    <ul class="dropdown-menu">
+                                        <?php 
 
-                                        // Display contents of each directory:
-                                        $repo->cd($dir);
-                                        if((strpos($repo->pwd(), '/components') === 0)){    //If we're in the components root dir.
-                                            foreach($repo->ls(false) as $item):       //Shows only directories
-                                            //foreach($repo->ls() as $item):              //Shows everything
-                                                $output = str_replace('.html', '', ucwords(str_replace('_', ' ', trim($item, '/'))));
-                                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= $output ?></a></li><?php
-                                            endforeach;
-                                        }
-                                        elseif((strpos($repo->pwd(), '/templates') === 0)){ //If we're in the templates root dir.
-                                            foreach($repo->ls() as $item):
-                                                if(!$repo->isDir($item)){                 //Shows only files
+                                            // Display contents of each directory:
+                                            $repo->cd($dir);
+                                            if((strpos($repo->pwd(), '/components') === 0)){    //If we're in the components root dir.
+                                                foreach($repo->ls(false) as $item):       //Shows only directories
+                                                //foreach($repo->ls() as $item):              //Shows everything
                                                     $output = str_replace('.html', '', ucwords(str_replace('_', ' ', trim($item, '/'))));
                                                     ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= $output ?></a></li><?php
-                                                }
-                                            endforeach;                            
-                                        }
-                                        else{
-                                            foreach($repo->ls() as $item):
-                                                $output = str_replace('.html', '', ucwords(str_replace('_', ' ', trim($item, '/'))));
-                                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= $output ?></a></li><?php
-                                            endforeach;                            
-                                        }
-                                        $repo->cd('..');
-                                    ?>
-                                </ul>
-                            </li>
-                            <?php 
+                                                endforeach;
+                                            }
+                                            elseif((strpos($repo->pwd(), '/templates') === 0)){ //If we're in the templates root dir.
+                                                foreach($repo->ls() as $item):
+                                                    if(!$repo->isDir($item)){                 //Shows only files
+                                                        $output = str_replace('.html', '', ucwords(str_replace('_', ' ', trim($item, '/'))));
+                                                        ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= $output ?></a></li><?php
+                                                    }
+                                                endforeach;                            
+                                            }
+                                            else{
+                                                foreach($repo->ls() as $item):
+                                                    $output = str_replace('.html', '', ucwords(str_replace('_', ' ', trim($item, '/'))));
+                                                   ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= $output ?></a></li><?php
+                                                endforeach;                            
+                                            }
+                                            $repo->cd('..');
+                                        ?>
+                                    </ul>
+                                </li>
+                                <?php 
+                            endif;
                         endforeach;
                         $repo->cd($current); 
                     ?>
@@ -324,7 +327,6 @@
             }
         ?>
     </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <?php
 
         // Output javascript inline:
@@ -339,6 +341,7 @@
         }
         $repo->cd($oldlocationlink);
     ?>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>

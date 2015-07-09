@@ -301,7 +301,7 @@ class BitBucketRepo{
         return array('classes' => $classes, 'ids' => $ids, 'tags' => $tags);
     }
     private $mainCSS = 0;
-    public function getcss(){
+    public function getcss($fix = false){
         if($this->mainCSS === 0){
             $text = '';
             $old = $this->pwd();
@@ -309,7 +309,12 @@ class BitBucketRepo{
             foreach($this->ls() as $file){
                 if(!$this->isDir($file)){
                     if(substr($file, -4) == '.css'){
-                        $text .= $this->contents($file);
+                        if($fix){
+                            $text .= $this->fixedcontents($file);
+                        }
+                        else{
+                            $text .= $this->contents($file);
+                        }
                     }
                 }
             }
