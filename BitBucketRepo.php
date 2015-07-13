@@ -3,13 +3,9 @@ class BitBucketRepo{
     private $directoryListing = array();
     private $parentURL;
     private $currentLoc = array();
-    private $mainCSS;
-    private $fixedCSS;
     function __construct($url){
         $this->parentURL = $url;
         $this->directoryListing = $this->getAllContents($this->parentURL, $this->directoryListing);
-        $this->mainCSS = 0;
-        $this->fixedCSS = 0;
     }
     private function getAllContents($url, $currentDir){
         $returnValue = file_get_contents($url);
@@ -267,56 +263,17 @@ class BitBucketRepo{
     }
     private function fixRelatives($text){
         // Find all relative URLs
-        $patterns = ['/\b\s*((?:src|href)\s*=\s*(["\']))(\s*((?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.).+?)\2)/i', '/\b\s*(url\s*\(\s*(["\']?)\s*)(((?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.).*?)\s*\2\))/i'];
+        $patterns = ['/((?:src|href)\s*=\s*(["\']))(\s*(?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.).+?\2)/i', '/(url\s*\(\s*(["\'])\s*)((?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.).*?\s*\2\))/i'];
         
         // Calculate what to prepend
         $prepend = $this->pwd();
         $prepend = trim($prepend, '/');
         $prepend = $this->parentURL . $prepend . '/';
 
-        // Find all matches
-        $matches = array();
-        foreach($patterns as $pattern){
-            preg_match_all($pattern, $text, $result);
-            $matches = array_merge($matches, $result[4]);
-        }
+        // Run the regex
+        $result = preg_replace($patterns, '${1}'.$prepend.'${3}' , $text);
 
-        // Download each match, and replace matches with new downloaded links
-        $date = new DateTime();
-        $stamp = session_id();
-        $count = 0;
-        foreach($matches as $match){
-
-            // Find extension
-            preg_match('/\.[^.]+?$/', $match, $extension);
-            $extension = $extension[0];
-
-            // Download the file
-            $filename = 'resources/'.$stamp.'/res_'.$count++.'_'.$extension;
-            $this->file_force_contents($filename, $this->contents($match));
-
-            // Replace URL
-            $text = str_replace($match, $filename, $text);
-        }
-
-        $this->cleanResources();
-        return $text;
-    }
-    private function cleanResources(){
-        $session_path = ini_get('session.save_path');
-        $session_files_dir = 'resources/';
-        if ($handle = opendir($session_files_dir)) {
-            while (false !== ($file = readdir($handle))) {
-                if ($file != '.' && $file != '..') {
-                    if (  file_exists("$session_path/sess_$file")  ) {
-                        // session is still alive
-                    } else {
-                        $this->deleteDir($session_files_dir.$file);
-                    }
-                }
-            }
-            closedir($handle);
-        }
+        return $result;
     }
     public function fixedcontents($path){
         return $this->fixRelatives($this->contents($path));
@@ -343,41 +300,26 @@ class BitBucketRepo{
         $tags = array_unique($tags);
         return array('classes' => $classes, 'ids' => $ids, 'tags' => $tags);
     }
+    private $mainCSS = 0;
     public function getcss($fix = false){
+        if($this->mainCSS === 0){
+            $text = '';
+            $old = $this->pwd();
+            $this->cd('/');
+            foreach($this->ls() as $file){
+                if(!$this->isDir($file)){
+                    if(substr($file, -4) == '.css'){
+                        $text .= $this->contents($file);
+                    }
+                }
+            }
+            $this->cd($old);
+            $this->mainCSS = $text;
+        }
         if($fix){
-            if($this->fixedCSS === 0){
-                $text = '';
-                $old = $this->pwd();
-                $this->cd('/');
-                foreach($this->ls() as $file){
-                    if(!$this->isDir($file)){
-                        if(substr($file, -4) == '.css'){
-                            $text .= $this->fixedcontents($file);
-                        }
-                    }
-                }
-                $this->cd($old);
-                $this->fixedCSS = $text;
-            }
-            return $this->fixedCSS;
+            return $this->fixRelatives($this->mainCSS);
         }
-        else{
-            if($this->mainCSS === 0){
-                $text = '';
-                $old = $this->pwd();
-                $this->cd('/');
-                foreach($this->ls() as $file){
-                    if(!$this->isDir($file)){
-                        if(substr($file, -4) == '.css'){
-                            $text .= $this->contents($file);
-                        }
-                    }
-                }
-                $this->cd($old);
-                $this->mainCSS = $text;
-            }
-            return $this->mainCSS;
-        }
+        return $this->mainCSS;
     }
     public function filtercss($type, $name){
         $text = $this->getcss();
