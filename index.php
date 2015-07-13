@@ -1,6 +1,6 @@
 <?php
-    session_start();
     require_once('BitBucketRepo.php');
+    session_start();
 ?>
 <!DOCTYPE html>
 <html>
@@ -20,6 +20,7 @@
         }
         else{
             $repo = new BitBucketRepo('https://bitbucket.org/api/1.0/repositories/mricotta/nyu/raw/master/');
+            $_SESSION['repo'] = $repo;
         }
 
         // Output CSS inline:
