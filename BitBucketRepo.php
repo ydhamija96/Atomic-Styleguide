@@ -131,7 +131,7 @@ class BitBucketRepo{
         // Create a directory and put the actual item in it:
         $foldername = substr($filename, 0, -5);    // Takes out the .html
         mkdir($rootname.'/'.$foldername);
-        file_put_contents($rootname.'/'.$foldername.'/'.$filename, $this->contents($item));
+        $this->file_force_contents($rootname.'/'.$foldername.'/'.$item, $this->contents($item));
         
         // Put root .css and .js in it:
         $oldlocation = $this->pwd();
@@ -139,7 +139,7 @@ class BitBucketRepo{
         foreach($this->ls() as $file){
             if(!$this->isDir($file)){
                 if(substr($file, -3) == '.js' || substr($file, -4) == '.css'){
-                    file_put_contents($rootname.'/'.$foldername.'/'.$file, $this->contents($file));
+                    $this->file_force_contents($rootname.'/'.$foldername.'/'.$file, $this->contents($file));
                 }
             }
         }
@@ -173,10 +173,10 @@ class BitBucketRepo{
         //Finally, copy the assets:
         foreach($this->ls(false) as $folder){
             $old = $this->pwd();
-            $this->cd($folder);
+            $this->cd('/');
             $assets = $this->findassets($html.'|'.$css);
             foreach($assets as $asset){
-                $this->file_force_contents($rootname.'/'.$foldername.'/'.$folder.$asset, $this->contents($asset));
+                $this->file_force_contents($rootname.'/'.$foldername.'/'.$asset, $this->contents($asset));
             }
             $this->cd($old);
         }
@@ -397,15 +397,20 @@ class BitBucketRepo{
             return $results[0];
         }
     }
-    public function findassets($text){   // Searches given text for any references to current folder
+    public function findassets($text){
+        $old = $this->pwd();
+        $this->cd('/');
         $assets = array();
-        preg_match_all('/'.$this->currentDir().'\/(.*?)[\'"]/is', $text, $results);
-        //$assets = $results[1];
+        $patterns = ['/\b\s*((?:src|href)\s*=\s*(["\']))(\s*((?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.).+?)\2)/i', '/\b\s*(url\s*\(\s*(["\']?)\s*)(((?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.).*?)\s*\2\))/i'];
+        $matches = array();
+        foreach($patterns as $pattern){
+            preg_match_all($pattern, $text, $result);
+            $matches = array_merge($matches, $result[4]);
+        }
+        $matches = array_unique($matches);
 
-        // Find any relevant files in the folder.
-        foreach($results[1] as $asset){
-            $temp = explode('/', $asset);
-            $temp = end(array_values($temp));
+        foreach($matches as $asset){
+            $temp = $asset;
             $temp = explode('.', $temp);
             array_pop($temp);
             $name = implode('.', $temp);
@@ -415,7 +420,9 @@ class BitBucketRepo{
                 }
             }
         }
+        $assets = array_unique($assets);
 
+        $this->cd($old);
         return $assets;
     }
 }

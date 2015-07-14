@@ -244,7 +244,7 @@
                                                 // Output any assets:
                                                 foreach($repo->ls(false) as $folder){
                                                     $oldlocation = $repo->pwd();
-                                                    $repo->cd($folder);
+                                                    $repo->cd('/');
                                                     $assets = $repo->findassets($html.'|'.$css);
                                                     foreach($assets as $asset){
                                                         $output = explode('/', $asset);
@@ -294,7 +294,6 @@
                                     <li>Store your single components in a 'components' folder in the root directory.</li> 
                                     <li>If you'd like to break components into sections, put them in subdirectories inside the 'components' folder.</li>
                                     <li>Store your templates in a 'templates' folder in the root directory.</li>
-                                    <li>Store any dependencies in folders in the <i>same location</i> where the template/component is. From there, we'll find 'em.</li>
                                 </ul>
                                 And that's it! We take care of the rest.
                             </p>
