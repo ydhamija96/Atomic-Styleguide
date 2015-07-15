@@ -19,7 +19,7 @@
             $repo = $_SESSION['repo'];
         }
         else{
-            $repo = new BitBucketRepo('https://bitbucket.org/api/1.0/repositories/mricotta/nyu/raw/master/');
+            $repo = new BitBucketRepo('https://bitbucket.org/api/1.0/repositories/bluefountainmedia/NYU/raw/master/');
             $_SESSION['repo'] = $repo;
         }
 
