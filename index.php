@@ -242,17 +242,15 @@
                                                 ?><a href="<?= $repo->link($item) ?>" download="<?= $item ?>"><?= $item ?></a><br /><?php
 
                                                 // Output any assets:
-                                                foreach($repo->ls(false) as $folder){
-                                                    $oldlocation = $repo->pwd();
-                                                    $repo->cd('/');
-                                                    $assets = $repo->findassets($html.'|'.$css);
-                                                    foreach($assets as $asset){
-                                                        $output = explode('/', $asset);
-                                                        $output = end(array_values($output));
-                                                        ?><a href="<?= $repo->link($asset) ?>" download="<?= $asset ?>"><?= $output ?></a><br /><?php
-                                                    }
-                                                    $repo->cd($oldlocation);
+                                                $oldlocation = $repo->pwd();
+                                                $repo->cd('/');
+                                                $assets = $repo->findassets($html.'|'.$css);
+                                                foreach($assets as $asset){
+                                                    $output = explode('/', $asset);
+                                                    $output = end(array_values($output));
+                                                    ?><a href="<?= $repo->link($asset) ?>" download="<?= $asset ?>"><?= $output ?></a><br /><?php
                                                 }
+                                                $repo->cd($oldlocation);
                                             ?>
                                         </div>
                                     </div>

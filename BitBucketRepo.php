@@ -171,15 +171,13 @@ class BitBucketRepo{
             }
         }
         //Finally, copy the assets:
-        foreach($this->ls(false) as $folder){
-            $old = $this->pwd();
-            $this->cd('/');
-            $assets = $this->findassets($html.'|'.$css);
-            foreach($assets as $asset){
-                $this->file_force_contents($rootname.'/'.$foldername.'/'.$asset, $this->contents($asset));
-            }
-            $this->cd($old);
+        $old = $this->pwd();
+        $this->cd('/');
+        $assets = $this->findassets($html.'|'.$css);
+        foreach($assets as $asset){
+            $this->file_force_contents($rootname.'/'.$foldername.'/'.$asset, $this->contents($asset));
         }
+        $this->cd($old);
         $this->cd($oldlocation);
         
         return $rootname;
