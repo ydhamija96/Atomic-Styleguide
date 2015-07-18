@@ -5,11 +5,14 @@ class BitBucketRepo{
     private $currentLoc = array();
     private $mainCSS;
     private $fixedCSS;
+    private $nonce;
     function __construct($url){
         $this->parentURL = $url;
         $this->directoryListing = $this->getAllContents($this->parentURL, $this->directoryListing);
         $this->mainCSS = 0;
         $this->fixedCSS = 0;
+        $this->nonce = hash('sha512', rand());
+        $_SESSION['nonce'] = $this->nonce;
     }
     private function getAllContents($url, $currentDir){
         $returnValue = file_get_contents($url);
@@ -298,7 +301,7 @@ class BitBucketRepo{
 
         // Replace matches with a special download+show link
         foreach($matches as $match){
-            $text = str_replace($match, 'downloadnshow.php?url='.strrev($this->link($match)), $text);   // Reversing string so that similar matches don't trigger multiple replacements
+            $text = str_replace($match, 'downloadnshow.php?url='.strrev($this->link($match)).'&nonce='.$this->nonce, $text);   // Reversing string so that similar matches don't trigger multiple replacements
         }
         
         return $text;

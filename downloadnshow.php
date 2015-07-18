@@ -1,10 +1,17 @@
 <?php
-	if(!isset($_GET['url'])){
+	session_start();
+	
+	if(!isset($_GET['url']) || !isset($_GET['nonce'])){
 		echo "gtfo";
 		exit;
+		die();
 	}
 
-	// Security Vulnerability!
+	if(!isset($_SESSION['nonce']) || $_SESSION['nonce'] != $_GET['nonce']){
+		echo "gtfo";
+		exit;
+		die();
+	}
 
 	$url = strrev($_GET['url']);
 
