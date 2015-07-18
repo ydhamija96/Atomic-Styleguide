@@ -97,12 +97,15 @@ class BitBucketRepo{
         return $result;
     }
     public function link($path){
-        if($path[0] == '/'){
-            return (rtrim($this->parentURL, '/') . '/' . ltrim($path, '/'));
+        $link = rtrim($this->parentURL, '/').'/';
+        $old = $this->pwd();
+        $this->cd($path);
+        $link .= $this->pwd();
+        if(end(explode('/', $path)) != end(explode('/', $link))){
+            $link = rtrim($link, '/').'/'.end(explode('/', $path));
         }
-        else{
-            return (rtrim($this->parentURL, '/') . '/' . ((count($this->currentLoc) > 0) ? trim(implode('/', $this->currentLoc), '/') . '/' : '') . ltrim($path, '/'));
-        }
+        $this->cd($old);
+        return $link;
     }
     public function contents($path){
         return file_get_contents($this->link($path));
@@ -265,12 +268,7 @@ class BitBucketRepo{
     }
     private function fixRelatives($text){
         // Find all relative URLs
-        $patterns = ['/\b\s*((?:src|href)\s*=\s*(["\']))(\s*((?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\.\'"]+?.*?[^+\.]+?)\2)/i', '/\b\s*(url\s*\(\s*(["\']?)\s*)(((?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\.\'"]+?.*?[^+\.]+?)\s*\2\))/i'];
-        
-        // Calculate what to prepend
-        $prepend = $this->pwd();
-        $prepend = trim($prepend, '/');
-        $prepend = $this->parentURL . $prepend . '/';
+        $patterns = ['/\b\s*((?:src|href)\s*=\s*(["\']))(\s*((?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\'"]+?.*?[^+\.]+?)\2)/i', '/\b\s*(url\s*\(\s*(["\']?)\s*)(((?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\'"]+?.*?[^+\.]+?)\s*\2\))/i'];
 
         // Find all matches
         $matches = array();
@@ -280,24 +278,29 @@ class BitBucketRepo{
         }
 
         // Download each match, and replace matches with new downloaded links
-        $date = new DateTime();
-        $stamp = session_id();
-        $count = 0;
+        // $date = new DateTime();
+        // $stamp = session_id();
+        // $count = 0;
+        // foreach($matches as $match){
+
+        //     // Find extension
+        //     preg_match('/\.[^.]+?$/', $match, $extension);
+        //     $extension = $extension[0];
+
+        //     // Download the file
+        //     $filename = 'resources/'.$stamp.'/res_'.$count++.'_'.$extension;
+        //     $this->file_force_contents($filename, $this->contents($match));
+
+        //     // Replace URL
+        //     $text = str_replace($match, $filename, $text);
+        // }
+        //$this->cleanResources();
+
+        // Replace matches with a special download+show link
         foreach($matches as $match){
-
-            // Find extension
-            preg_match('/\.[^.]+?$/', $match, $extension);
-            $extension = $extension[0];
-
-            // Download the file
-            $filename = 'resources/'.$stamp.'/res_'.$count++.'_'.$extension;
-            $this->file_force_contents($filename, $this->contents($match));
-
-            // Replace URL
-            $text = str_replace($match, $filename, $text);
+            $text = str_replace($match, 'downloadnshow.php?url='.strrev($this->link($match)), $text);   // Reversing string so that similar matches don't trigger multiple replacements
         }
-
-        $this->cleanResources();
+        
         return $text;
     }
     private function cleanResources(){
@@ -399,7 +402,7 @@ class BitBucketRepo{
         $old = $this->pwd();
         $this->cd('/');
         $assets = array();
-        $patterns = ['/\b\s*((?:src|href)\s*=\s*(["\']))(\s*((?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\.\'"]+?.*?[^+\.]+?)\2)/i', '/\b\s*(url\s*\(\s*(["\']?)\s*)(((?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\.\'"]+?.*?[^+\.]+?)\s*\2\))/i'];
+        $patterns = ['/\b\s*((?:src|href)\s*=\s*(["\']))(\s*((?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\'"]+?.*?[^+\.]+?)\2)/i', '/\b\s*(url\s*\(\s*(["\']?)\s*)(((?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\'"]+?.*?[^+\.]+?)\s*\2\))/i'];
         $matches = array();
         foreach($patterns as $pattern){
             preg_match_all($pattern, $text, $result);
