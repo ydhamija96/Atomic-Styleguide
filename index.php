@@ -345,16 +345,15 @@
                                     </p><br /><br />
                                     <h5>Here's how to use us:</h5>
                                     <p>
-                                        Just create a public BitBucket repository (support for private ones is coming soon), store your design
+                                        Just create a publicly viewable BitBucket repository (support for private ones is coming soon), store your design
                                         elements in there, and we'll take care of the rest. <br /><br />
-                                        Just follow this simple structure:<br />
+                                        Just follow three rules:<br />
                                         <ul>
-                                            <li>Store your master .css and .js file(s) in the root directory.</li>
-                                            <li>Store your single components in a 'components' folder in the root directory.</li> 
-                                            <li>If you'd like to break components into sections, put them in subdirectories inside the 'components' folder.</li>
-                                            <li>Store your templates in a 'templates' folder in the root directory.</li>
+                                            <li>Store your .css and .js file(s) in the root directory. We'll separate out the relevant portions of the CSS for each individual component.</li>
+                                            <li>Store your component .html's like this: components/component-subgroup/individual-component.html</li> 
+                                            <li>Store your template .html's like this: templates/individual-template.html</li>
                                         </ul>
-                                        And that's it! We take care of the rest.
+                                        Other than that, go wild. Put images and assets in assets/images/img/i/a/b/c/quarentine/IlikeJuice/42/ -- we'll still find 'em.
                                     </p>
                                 </div>
                             <?php                    

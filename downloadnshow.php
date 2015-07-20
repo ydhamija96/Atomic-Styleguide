@@ -24,7 +24,7 @@
 	$file = 'resources/'.$file;
 
     // Download the file
-	if(!file_exists($file) && $extension != '.css' && $extension != '.js'){
+	if(!file_exists($file)){
     	file_put_contents($file, file_get_contents($url));
     }
 
