@@ -387,7 +387,21 @@ class BitBucketRepo{
         $text = $this->getcss();
         if($type == 'class'){
             preg_match_all('/\.'.$name.'\b.*?{.*?}/is', $text, $results);
-            $results[0] = preg_replace('/,.*?{/is',' {', $results[0]);
+            $results[0] = array_unique($results[0]);
+            foreach($results[0] as &$result){
+                $ismedia = preg_match('/'.preg_quote($result, '/').'.*?(}[^{]*}|@media)/is', $text, $ending);
+                $media = '';
+                $end = '';
+                if(strpos($ending[1], '}') !== false){
+                    $reversedNeedle = preg_quote(strrev($result), '/');
+                    $reversedHaystack = strrev($text);
+                    preg_match('/'.$reversedNeedle.'.*({.*?aidem@)/is', $reversedHaystack, $reversedMedia);    // testing required
+                    $media = strrev($reversedMedia[1]);
+                    $end = '}';
+                }
+                $result = preg_replace('/,.*?{/is',' {', $result);
+                $result = $media . PHP_EOL . $result . PHP_EOL . $end;
+            }
             return $results[0];
         }
         if($type == 'id'){
