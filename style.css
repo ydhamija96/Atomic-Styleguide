@@ -5,7 +5,7 @@ body > #content > .singleElement > .options{
     display:inline-block;
     float:left;
     width:20%;
-    min-width:210px;
+    min-width:165px;
     margin-bottom:20px;
 }
 body > #content > .options{

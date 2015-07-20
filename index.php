@@ -60,11 +60,14 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <form class="navbar-form navbar-left" role="search" method="GET" action="index.php">
+                    <li id="atomic-styleguide-search-button" style="cursor:pointer;"><p class="navbar-text"><i class="fa fa-search"></i></p></li>
+                    <li id="atomic-styleguide-search-form" style="width:0; height:0; overflow:hidden;">
+                        <form class="navbar-form navbar-left" role="search" method="GET" action="index.php">
                         <div class="form-group">
                             <input type="text" name="search" class="form-control" placeholder="Search">
                         </div>
-                    </form>
+                        </form>
+                    </li>
                     <?php
 
                         // Display all directories in bitbucket root:
@@ -227,7 +230,7 @@
                                             <i class="fa fa-css3 fa-fw"></i> See the CSS
                                         </button>
                                         <button class="btn" type="button" data-toggle="collapse" data-target="#assets<?= $counter ?>" aria-expanded="false" aria-controls="assets<?= $counter ?>">
-                                            <i class="fa fa-download fa-fw"></i> Download Individual Files
+                                            <i class="fa fa-download fa-fw"></i> Download Files
                                         </button>
                                     </div>
                                     <div class="element">
@@ -359,100 +362,102 @@
 
                     // Display the single item
                     ?>
-                    <div class="options">
-                        <?php
-                            $output = ucwords(preg_replace('/.*\/(.+)\.html/i', '${1}', str_replace('_', ' ', $path)));
-                        ?>
-                        <h4><?= $output ?></h4>
-                        <form action="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]&download=TRUE" ?>" method="POST">
-                            <input type="text" name="downloadpath" style="display:none;" value="<?= $path ?>" />
-                            <input type="submit" class="btn" value="Download Files .zip"></input>
-                        </form>
-                        <button class="btn" type="button" data-toggle="collapse" data-target="#html" aria-expanded="false" aria-controls="html">
-                            <i class="fa fa-html5 fa-fw"></i> See the HTML
-                        </button>
-                        <button class="btn" type="button" data-toggle="collapse" data-target="#css" aria-expanded="false" aria-controls="css">
-                            <i class="fa fa-css3 fa-fw"></i> See the CSS
-                        </button>
-                        <button class="btn" type="button" data-toggle="collapse" data-target="#assets" aria-expanded="false" aria-controls="assets">
-                            <i class="fa fa-download fa-fw"></i> Download Individual Files
-                        </button>
-                    </div>
-                    <div class="element">
-                        <div class="collapse" id="html">
-                            <div class="well">
-                                <h5>HTML:</h5>
-                                <pre><code class='html'><?= htmlspecialchars($repo->contents($path)) ?></code></pre>
-                                <?php 
-                                    $html=$repo->contents($path);   // Used later to show assets only applicable to this HTML
-                                ?>
-                            </div>
+                    <div class="singleElement">
+                        <div class="options">
+                            <?php
+                                $output = ucwords(preg_replace('/.*\/(.+)\.html/i', '${1}', str_replace('_', ' ', $path)));
+                            ?>
+                            <h4><?= $output ?></h4>
+                            <form action="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]&download=TRUE" ?>" method="POST">
+                                <input type="text" name="downloadpath" style="display:none;" value="<?= $path ?>" />
+                                <input type="submit" class="btn" value="Download Files .zip"></input>
+                            </form>
+                            <button class="btn" type="button" data-toggle="collapse" data-target="#html" aria-expanded="false" aria-controls="html">
+                                <i class="fa fa-html5 fa-fw"></i> See the HTML
+                            </button>
+                            <button class="btn" type="button" data-toggle="collapse" data-target="#css" aria-expanded="false" aria-controls="css">
+                                <i class="fa fa-css3 fa-fw"></i> See the CSS
+                            </button>
+                            <button class="btn" type="button" data-toggle="collapse" data-target="#assets" aria-expanded="false" aria-controls="assets">
+                                <i class="fa fa-download fa-fw"></i> Download Files
+                            </button>
                         </div>
-                        <div class="collapse" id="css">
-                            <div class="well">
-                                <h5>CSS:</h5>
-                                <?php 
-                                    $css = '';  // Used later to show assets only applicable to this CSS
-                                    $tags = $repo->findselectors($repo->contents($path));
-                                    echo "<pre><code class='css'>";
-                                        foreach($tags['classes'] as $class){
-                                            foreach($repo->filtercss('class', $class) as $section){
-                                                echo $section;
-                                                echo "\n";
-                                                $css .= $section;
-                                            }
-                                        }
-                                        foreach($tags['ids'] as $id){
-                                            foreach($repo->filtercss('id', $id) as $section){
-                                                echo $section;
-                                                echo "\n";
-                                                $css .= $section;
-                                            }
-                                        }
-                                        foreach($tags['tags'] as $tag){
-                                            foreach($repo->filtercss('tag', $tag) as $section){
-                                                echo $section;
-                                                echo "\n";
-                                                $css .= $section;
-                                            }
-                                        }
-                                    echo "</code></pre>";
-                                ?>
+                        <div class="element">
+                            <div class="collapse" id="html">
+                                <div class="well">
+                                    <h5>HTML:</h5>
+                                    <pre><code class='html'><?= htmlspecialchars($repo->contents($path)) ?></code></pre>
+                                    <?php 
+                                        $html=$repo->contents($path);   // Used later to show assets only applicable to this HTML
+                                    ?>
+                                </div>
                             </div>
-                        </div>
-                        <div class="collapse" id="assets">
-                            <div class="well">
-                                <h5>Assets:</h5>
-                                <?php
-                                    // Output the root css and js files:
-                                    $oldlocation = $repo->pwd();
-                                    $repo->cd('/');
-                                    foreach($repo->ls() as $file){
-                                        if(!$repo->isDir($file)){
-                                            if(substr($file, -3) == '.js' || substr($file, -4) == '.css'){
-                                                ?><a href="<?= $repo->link($file) ?>" download="<?= $file ?>"><?= $file ?></a><br /><?php
+                            <div class="collapse" id="css">
+                                <div class="well">
+                                    <h5>CSS:</h5>
+                                    <?php 
+                                        $css = '';  // Used later to show assets only applicable to this CSS
+                                        $tags = $repo->findselectors($repo->contents($path));
+                                        echo "<pre><code class='css'>";
+                                            foreach($tags['classes'] as $class){
+                                                foreach($repo->filtercss('class', $class) as $section){
+                                                    echo $section;
+                                                    echo "\n";
+                                                    $css .= $section;
+                                                }
+                                            }
+                                            foreach($tags['ids'] as $id){
+                                                foreach($repo->filtercss('id', $id) as $section){
+                                                    echo $section;
+                                                    echo "\n";
+                                                    $css .= $section;
+                                                }
+                                            }
+                                            foreach($tags['tags'] as $tag){
+                                                foreach($repo->filtercss('tag', $tag) as $section){
+                                                    echo $section;
+                                                    echo "\n";
+                                                    $css .= $section;
+                                                }
+                                            }
+                                        echo "</code></pre>";
+                                    ?>
+                                </div>
+                            </div>
+                            <div class="collapse" id="assets">
+                                <div class="well">
+                                    <h5>Assets:</h5>
+                                    <?php
+                                        // Output the root css and js files:
+                                        $oldlocation = $repo->pwd();
+                                        $repo->cd('/');
+                                        foreach($repo->ls() as $file){
+                                            if(!$repo->isDir($file)){
+                                                if(substr($file, -3) == '.js' || substr($file, -4) == '.css'){
+                                                    ?><a href="<?= $repo->link($file) ?>" download="<?= $file ?>"><?= $file ?></a><br /><?php
+                                                }
                                             }
                                         }
-                                    }
-                                    $repo->cd($oldlocation);
+                                        $repo->cd($oldlocation);
 
-                                    // Output the file itself:
-                                    ?><a href="<?= $repo->link($path) ?>" download="<?= $path ?>"><?= $path ?></a><br /><?php
+                                        // Output the file itself:
+                                        ?><a href="<?= $repo->link($path) ?>" download="<?= $path ?>"><?= $path ?></a><br /><?php
 
-                                    // Output any assets:
-                                    $oldlocation = $repo->pwd();
-                                    $repo->cd('/');
-                                    $assets = $repo->findassets($html.'|'.$css);
-                                    foreach($assets as $asset){
-                                        $output = explode('/', $asset);
-                                        $output = end(array_values($output));
-                                        ?><a href="<?= $repo->link($asset) ?>" download="<?= $asset ?>"><?= $output ?></a><br /><?php
-                                    }
-                                    $repo->cd($oldlocation);
-                                ?>
+                                        // Output any assets:
+                                        $oldlocation = $repo->pwd();
+                                        $repo->cd('/');
+                                        $assets = $repo->findassets($html.'|'.$css);
+                                        foreach($assets as $asset){
+                                            $output = explode('/', $asset);
+                                            $output = end(array_values($output));
+                                            ?><a href="<?= $repo->link($asset) ?>" download="<?= $asset ?>"><?= $output ?></a><br /><?php
+                                        }
+                                        $repo->cd($oldlocation);
+                                    ?>
+                                </div>
                             </div>
+                            <?php echo $repo->fixedcontents($path); ?>
                         </div>
-                        <?php echo $repo->fixedcontents($path); ?>
                     </div>
                     <?php
                 }
@@ -478,7 +483,16 @@
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script><!-- No idea if licensing allows this. -->
-    <script>hljs.initHighlightingOnLoad();</script>
+    <script>
+        hljs.initHighlightingOnLoad();
+        var search_expanded = false;
+        $('#atomic-styleguide-search-button').click(function(){
+            $('#atomic-styleguide-search-form').animate({ width: (search_expanded)?'0':'225px', height: (search_expanded)?'0':'51px' }, 500, function(){
+                search_expanded = !search_expanded;
+            });
+            $('#atomic-styleguide-search-button').css('background-color', (search_expanded)?'inherit':'#CCCCCC');
+        });
+    </script>
 </body>
 
 </html>
