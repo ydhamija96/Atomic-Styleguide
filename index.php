@@ -60,6 +60,11 @@
             </div>
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
+                    <form class="navbar-form navbar-left" role="search" method="GET" action="index.php">
+                        <div class="form-group">
+                            <input type="text" name="search" class="form-control" placeholder="Search">
+                        </div>
+                    </form>
                     <?php
 
                         // Display all directories in bitbucket root:
@@ -149,181 +154,228 @@
         </div>
     </nav>
     <div id="content" class="demo_class">
-        <?php
-            if(!$singleFile){   // If the URL does not specify a single file in the repo
-                if(strpos($repo->pwd(), '/components') === 0){  // If in components root dir
-                    $counter = 0;
-
-                    // Display all items that are not directories:
-                    foreach($repo->ls() as $item){
-                        if(!$repo->isDir($item)){
-                            ++$counter;
-                            echo '<div class="singleElement">'; ?>
-                                <div class="options">
-                                    <?php
-                                        $output = substr($item, 0, -5);     // Takes out the .html
-                                        $output = ucwords(str_replace("_", ' ', $output));
-                                    ?>
-                                    <h4><?= $output ?></h4>
-                                    <form action="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]&download=TRUE" ?>" method="POST">
-                                        <input type="text" name="downloadpath" style="display:none;" value="<?= $repo->pwd().'/'.$item ?>" />
-                                        <input type="submit" class="btn" value="Download Files .zip"></input>
-                                    </form>
-                                    <button class="btn" type="button" data-toggle="collapse" data-target="#html<?= $counter ?>" aria-expanded="false" aria-controls="html<?= $counter ?>">
-                                        <i class="fa fa-html5 fa-fw"></i> See the HTML
-                                    </button>
-                                    <button class="btn" type="button" data-toggle="collapse" data-target="#css<?= $counter ?>" aria-expanded="false" aria-controls="css<?= $counter ?>">
-                                        <i class="fa fa-css3 fa-fw"></i> See the CSS
-                                    </button>
-                                    <button class="btn" type="button" data-toggle="collapse" data-target="#assets<?= $counter ?>" aria-expanded="false" aria-controls="assets<?= $counter ?>">
-                                        <i class="fa fa-download fa-fw"></i> Download Individual Files
-                                    </button>
-                                </div>
-                                <div class="element">
-                                    <div class="import"><?php echo $repo->fixedcontents($item); ?></div>
-                                    <div class="collapse" id="html<?= $counter ?>">
-                                        <div class="well">
-                                            <h5>HTML:</h5>
-                                            <pre><code class='html'><?= htmlspecialchars($repo->contents($item)) ?></code></pre>
-                                            <?php 
-                                                $html=$repo->contents($item);   // Used later to show assets only applicable to this HTML
-                                            ?>
-                                        </div>
-                                    </div>
-                                    <div class="collapse" id="css<?= $counter ?>">
-                                        <div class="well">
-                                            <h5>CSS:</h5>
-                                            <?php 
-                                                $css = '';  // Used later to show assets only applicable to this CSS
-                                                $tags = $repo->findselectors($repo->contents($item));
-                                                echo "<pre><code class='css'>";
-                                                    foreach($tags['classes'] as $class){
-                                                        foreach($repo->filtercss('class', $class) as $section){
-                                                            echo $section;
-                                                            echo "\n";
-                                                            $css .= $section;
-                                                        }
-                                                    }
-                                                    foreach($tags['ids'] as $id){
-                                                        foreach($repo->filtercss('id', $id) as $section){
-                                                            echo $section;
-                                                            echo "\n";
-                                                            $css .= $section;
-                                                        }
-                                                    }
-                                                    foreach($tags['tags'] as $tag){
-                                                        foreach($repo->filtercss('tag', $tag) as $section){
-                                                            echo $section;
-                                                            echo "\n";
-                                                            $css .= $section;
-                                                        }
-                                                    }
-                                                echo "</code></pre>";
-                                            ?>
-                                        </div>
-                                    </div>
-                                    <div class="collapse" id="assets<?= $counter ?>">
-                                        <div class="well">
-                                            <h5>Assets:</h5>
-                                            <?php
-                                                // Output the root css and js files:
-                                                $oldlocation = $repo->pwd();
-                                                $repo->cd('/');
-                                                foreach($repo->ls() as $file){
-                                                    if(!$repo->isDir($file)){
-                                                        if(substr($file, -3) == '.js' || substr($file, -4) == '.css'){
-                                                            ?><a href="<?= $repo->link($file) ?>" download="<?= $file ?>"><?= $file ?></a><br /><?php
-                                                        }
-                                                    }
-                                                }
-                                                $repo->cd($oldlocation);
-
-                                                // Output the file itself:
-                                                ?><a href="<?= $repo->link($item) ?>" download="<?= $item ?>"><?= $item ?></a><br /><?php
-
-                                                // Output any assets:
-                                                $oldlocation = $repo->pwd();
-                                                $repo->cd('/');
-                                                $assets = $repo->findassets($html.'|'.$css);
-                                                foreach($assets as $asset){
-                                                    $output = explode('/', $asset);
-                                                    $output = end(array_values($output));
-                                                    ?><a href="<?= $repo->link($asset) ?>" download="<?= $asset ?>"><?= $output ?></a><br /><?php
-                                                }
-                                                $repo->cd($oldlocation);
-                                            ?>
-                                        </div>
-                                    </div>
-                                </div>
-                                <?php
-                            echo '</div>';
-                        }
+        <?php if(isset($_GET['search'])): ?>
+            <?php 
+                $search = htmlspecialchars($_GET['search']);
+            ?>
+            <div class="singleElement">
+                <h5>Closest things to '<?=$search?>' we could find:</h5>
+            </div>
+            <?php
+                function cmp($a, $b){
+                    if($a == $b){
+                        return 0;
+                    }
+                    similar_text(end(explode('/', $a)), $_GET['search'], $vala);
+                    similar_text(end(explode('/', $b)), $_GET['search'], $valb);
+                    if($vala >= $valb){
+                        return -1;
+                    }
+                    else{
+                        return 1;
                     }
                 }
-                elseif(strpos($repo->pwd(), '/templates') === 0){   // If in templatesroot dir.
-
-                    // Note: User should never arrive here because templates menu
-                        // only shows single templates files. $singleFile would be true.
-                    echo "<pre>" . $repo->pwd() . ":<br>";
-                    print_r($repo->ls());
-                    echo "</pre>";
+                $old = $repo->pwd();
+                $repo->cd('/');
+                $files = array();
+                foreach($repo->ls(true, true) as $path){
+                    if(explode('/', $path)[0] == 'components' || explode('/', $path)[0] == 'templates'){
+                        $files[] = $path;
+                    }
                 }
-                elseif($repo->pwd() == '/'){   // If at document root.
+                usort($files, "cmp");
+                $ctr = 0;
+                foreach($files as $result){
+                    if($ctr >= 5){
+                        break;
+                    }
+                    ++$ctr;
                     ?>
-                        <div id="homeContent">
-                            <h2>Welcome...</h2>
-                            <h4>...to the Atomic Style Guide! :)</h4><br />
-                            <h5>Here's what we do:</h5>
-                            <p>
-                                In atomic designs (designs that are broken down into individual components/templates), 
-                                we are the style guide. We will display each component, show its HTML 
-                                and CSS code, and allow it (and each or all of its dependencies) to be downloaded at the click of
-                                a button.<br /><br />
-                                Each element is directly accessed from where it is stored, so there is no updating
-                                or CMS to worry about. We will always display the latest and greatest version of every element.
-                            </p><br /><br />
-                            <h5>Here's how to use us:</h5>
-                            <p>
-                                Just create a public BitBucket repository (support for private ones is coming soon), store your design
-                                elements in there, and we'll take care of the rest. <br /><br />
-                                Just follow this simple structure:<br />
-                                <ul>
-                                    <li>Store your master .css and .js file(s) in the root directory.</li>
-                                    <li>Store your single components in a 'components' folder in the root directory.</li> 
-                                    <li>If you'd like to break components into sections, put them in subdirectories inside the 'components' folder.</li>
-                                    <li>Store your templates in a 'templates' folder in the root directory.</li>
-                                </ul>
-                                And that's it! We take care of the rest.
-                            </p>
+                        <div class="singleElement">
+                            <?php $output = str_replace('.html', '', ucwords(str_replace('/', ' > ', str_replace('_', ' ', trim((isset($result))?$result:'', '/'))))); ?>
+                            <a href="?path=<?=$result?>"><?=$output?></a>
                         </div>
-                    <?php                    
-                }
-                else{   // If in some other root dir.
-                    echo "<pre>" . $repo->pwd() . ":<br>";
-                    print_r($repo->ls(true, true));
-                    echo "</pre>";
-                }
-            }
-            else{   // If a single file is specified in the URL
-
-                // Display the single item
-                ?>
-                <div class="options">
                     <?php
-                        $output = ucwords(preg_replace('/.*\/(.+)\.html/i', '${1}', str_replace('_', ' ', $path)));
+                }
+                $repo->cd($old);
+            ?>
+        <?php else: ?>
+            <?php
+                if(!$singleFile){   // If the URL does not specify a single file in the repo
+                    if(strpos($repo->pwd(), '/components') === 0){  // If in components root dir
+                        $counter = 0;
+
+                        // Display all items that are not directories:
+                        foreach($repo->ls() as $item){
+                            if(!$repo->isDir($item)){
+                                ++$counter;
+                                echo '<div class="singleElement">'; ?>
+                                    <div class="options">
+                                        <?php
+                                            $output = substr($item, 0, -5);     // Takes out the .html
+                                            $output = ucwords(str_replace("_", ' ', $output));
+                                        ?>
+                                        <h4><?= $output ?></h4>
+                                        <form action="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]&download=TRUE" ?>" method="POST">
+                                            <input type="text" name="downloadpath" style="display:none;" value="<?= $repo->pwd().'/'.$item ?>" />
+                                            <input type="submit" class="btn" value="Download Files .zip"></input>
+                                        </form>
+                                        <button class="btn" type="button" data-toggle="collapse" data-target="#html<?= $counter ?>" aria-expanded="false" aria-controls="html<?= $counter ?>">
+                                            <i class="fa fa-html5 fa-fw"></i> See the HTML
+                                        </button>
+                                        <button class="btn" type="button" data-toggle="collapse" data-target="#css<?= $counter ?>" aria-expanded="false" aria-controls="css<?= $counter ?>">
+                                            <i class="fa fa-css3 fa-fw"></i> See the CSS
+                                        </button>
+                                        <button class="btn" type="button" data-toggle="collapse" data-target="#assets<?= $counter ?>" aria-expanded="false" aria-controls="assets<?= $counter ?>">
+                                            <i class="fa fa-download fa-fw"></i> Download Individual Files
+                                        </button>
+                                    </div>
+                                    <div class="element">
+                                        <div class="import"><?php echo $repo->fixedcontents($item); ?></div>
+                                        <div class="collapse" id="html<?= $counter ?>">
+                                            <div class="well">
+                                                <h5>HTML:</h5>
+                                                <pre><code class='html'><?= htmlspecialchars($repo->contents($item)) ?></code></pre>
+                                                <?php 
+                                                    $html=$repo->contents($item);   // Used later to show assets only applicable to this HTML
+                                                ?>
+                                            </div>
+                                        </div>
+                                        <div class="collapse" id="css<?= $counter ?>">
+                                            <div class="well">
+                                                <h5>CSS:</h5>
+                                                <?php 
+                                                    $css = '';  // Used later to show assets only applicable to this CSS
+                                                    $tags = $repo->findselectors($repo->contents($item));
+                                                    echo "<pre><code class='css'>";
+                                                        foreach($tags['classes'] as $class){
+                                                            foreach($repo->filtercss('class', $class) as $section){
+                                                                echo $section;
+                                                                echo "\n";
+                                                                $css .= $section;
+                                                            }
+                                                        }
+                                                        foreach($tags['ids'] as $id){
+                                                            foreach($repo->filtercss('id', $id) as $section){
+                                                                echo $section;
+                                                                echo "\n";
+                                                                $css .= $section;
+                                                            }
+                                                        }
+                                                        foreach($tags['tags'] as $tag){
+                                                            foreach($repo->filtercss('tag', $tag) as $section){
+                                                                echo $section;
+                                                                echo "\n";
+                                                                $css .= $section;
+                                                            }
+                                                        }
+                                                    echo "</code></pre>";
+                                                ?>
+                                            </div>
+                                        </div>
+                                        <div class="collapse" id="assets<?= $counter ?>">
+                                            <div class="well">
+                                                <h5>Assets:</h5>
+                                                <?php
+                                                    // Output the root css and js files:
+                                                    $oldlocation = $repo->pwd();
+                                                    $repo->cd('/');
+                                                    foreach($repo->ls() as $file){
+                                                        if(!$repo->isDir($file)){
+                                                            if(substr($file, -3) == '.js' || substr($file, -4) == '.css'){
+                                                                ?><a href="<?= $repo->link($file) ?>" download="<?= $file ?>"><?= $file ?></a><br /><?php
+                                                            }
+                                                        }
+                                                    }
+                                                    $repo->cd($oldlocation);
+
+                                                    // Output the file itself:
+                                                    ?><a href="<?= $repo->link($item) ?>" download="<?= $item ?>"><?= $item ?></a><br /><?php
+
+                                                    // Output any assets:
+                                                    $oldlocation = $repo->pwd();
+                                                    $repo->cd('/');
+                                                    $assets = $repo->findassets($html.'|'.$css);
+                                                    foreach($assets as $asset){
+                                                        $output = explode('/', $asset);
+                                                        $output = end(array_values($output));
+                                                        ?><a href="<?= $repo->link($asset) ?>" download="<?= $asset ?>"><?= $output ?></a><br /><?php
+                                                    }
+                                                    $repo->cd($oldlocation);
+                                                ?>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
+                                echo '</div>';
+                            }
+                        }
+                    }
+                    elseif(strpos($repo->pwd(), '/templates') === 0){   // If in templatesroot dir.
+
+                        // Note: User should never arrive here because templates menu
+                            // only shows single templates files. $singleFile would be true.
+                        echo "<pre>" . $repo->pwd() . ":<br>";
+                        print_r($repo->ls());
+                        echo "</pre>";
+                    }
+                    elseif($repo->pwd() == '/'){   // If at document root.
+                        ?>
+                            <div id="homeContent">
+                                <h2>Welcome...</h2>
+                                <h4>...to the Atomic Style Guide! :)</h4><br />
+                                <h5>Here's what we do:</h5>
+                                <p>
+                                    In atomic designs (designs that are broken down into individual components/templates), 
+                                    we are the style guide. We will display each component, show its HTML 
+                                    and CSS code, and allow it (and each or all of its dependencies) to be downloaded at the click of
+                                    a button.<br /><br />
+                                    Each element is directly accessed from where it is stored, so there is no updating
+                                    or CMS to worry about. We will always display the latest and greatest version of every element.
+                                </p><br /><br />
+                                <h5>Here's how to use us:</h5>
+                                <p>
+                                    Just create a public BitBucket repository (support for private ones is coming soon), store your design
+                                    elements in there, and we'll take care of the rest. <br /><br />
+                                    Just follow this simple structure:<br />
+                                    <ul>
+                                        <li>Store your master .css and .js file(s) in the root directory.</li>
+                                        <li>Store your single components in a 'components' folder in the root directory.</li> 
+                                        <li>If you'd like to break components into sections, put them in subdirectories inside the 'components' folder.</li>
+                                        <li>Store your templates in a 'templates' folder in the root directory.</li>
+                                    </ul>
+                                    And that's it! We take care of the rest.
+                                </p>
+                            </div>
+                        <?php                    
+                    }
+                    else{   // If in some other root dir.
+                        echo "<pre>" . $repo->pwd() . ":<br>";
+                        print_r($repo->ls(true, true));
+                        echo "</pre>";
+                    }
+                }
+                else{   // If a single file is specified in the URL
+
+                    // Display the single item
                     ?>
-                    <h4><?= $output ?></h4>
-                    <form action="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]&download=TRUE" ?>" method="POST">
-                        <input type="text" name="downloadpath" style="display:none;" value="<?= $path ?>" />
-                        <input type="submit" class="btn" value="Download .zip"></input>
-                    </form>
-                </div>
-                <div class="element">
-                    <?php echo $repo->fixedcontents($path); ?>
-                </div>
-                <?php
-            }
-        ?>
+                    <div class="options">
+                        <?php
+                            $output = ucwords(preg_replace('/.*\/(.+)\.html/i', '${1}', str_replace('_', ' ', $path)));
+                        ?>
+                        <h4><?= $output ?></h4>
+                        <form action="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]&download=TRUE" ?>" method="POST">
+                            <input type="text" name="downloadpath" style="display:none;" value="<?= $path ?>" />
+                            <input type="submit" class="btn" value="Download .zip"></input>
+                        </form>
+                    </div>
+                    <div class="element">
+                        <?php echo $repo->fixedcontents($path); ?>
+                    </div>
+                    <?php
+                }
+            ?>
+        <?php endif; ?>
     </div>
     <?php
 
