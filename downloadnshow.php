@@ -7,7 +7,7 @@
 		die();
 	}
 
-	if(!isset($_SESSION['nonce']) || $_SESSION['nonce'] != $_GET['nonce']){
+	if(!isset($_SESSION['nonce']) || !isset($_SESSION['repo']) || $_SESSION['nonce'] != $_GET['nonce']){
 		echo "gtfo";
 		exit;
 		die();
