@@ -383,23 +383,57 @@ class BitBucketRepo{
             return $this->mainCSS;
         }
     }
+    private function parse_css_media_queries($css){
+        $mediaBlocks = array();
+        $start = 0;
+        while(($start = strpos($css, "@media", $start)) !== false){
+            $s = array();
+            $i = strpos($css, "{", $start);
+            if ($i !== false){
+                array_push($s, $css[$i]);
+                ++$i;
+                while (!empty($s)){
+                    if ($css[$i] == "{"){
+                        array_push($s, "{");
+                    }
+                    elseif ($css[$i] == "}"){
+                        array_pop($s);
+                    }
+                    ++$i;
+                }
+                $mediaBlocks[] = substr($css, $start, ($i + 1) - $start);
+                $start = $i;
+            }
+        }
+        return $mediaBlocks;
+    }
     public function filtercss($type, $name){
         $text = $this->getcss();
+        $mediablocks = $this->parse_css_media_queries($text);
         if($type == 'class'){
             preg_match_all('/\.'.$name.'\b.*?{.*?}/is', $text, $results);
-            $results[0] = preg_replace('/,.*?{/is',' {', $results[0]);
-            return $results[0];
         }
         if($type == 'id'){
             preg_match_all('/#'.$name.'\b.*?{.*?}/is', $text, $results);
-            $results[0] = preg_replace('/,.*?{/is',' {', $results[0]);
-            return $results[0];
         }
         if($type == 'tag'){
             preg_match_all('/\b(?<![.#])'.$name.'\b.*?{.*?}/is', $text, $results);
-            $results[0] = preg_replace('/,.*?{/is',' {', $results[0]);
-            return $results[0];
         }
+        foreach($results[0] as &$result){
+            $prepend = '';
+            $postpend = '';
+            foreach($mediablocks as $mediablock){
+                if(strpos($mediablock, $result) !== false){
+                    preg_match('/@media.*?{/i', $mediablock, $prepends);
+                    $prepend .= $prepends[0] . PHP_EOL;
+                    $postpend .= PHP_EOL.'}';
+                    break;
+                }
+            }
+            $result = preg_replace('/,.*?{/is',' {', $result);
+            $result = $prepend.$result.$postpend;
+        }
+        return $results[0];
     }
     public function findassets($text){
         $old = $this->pwd();
