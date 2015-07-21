@@ -97,13 +97,6 @@ class BitBucketRepo{
                 $result[] = $key;
             }
         }
-        usort($result, function($a, $b){
-            $adepth = substr_count($a, '/');
-            $bdepth = substr_count($b, '/');
-            if($adepth == $bdepth) {return 0;}
-            if($adepth > $bdepth) {return -1;}
-            if($adepth < $bdepth) {return 1;}
-        });
         return $result;
     }
     public function link($path){
