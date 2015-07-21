@@ -408,7 +408,7 @@ class BitBucketRepo{
         return $mediaBlocks;
     }
     public function filtercss($type, $name){
-        $text = $this->getcss();
+        $text = preg_replace('/\/\*.*?\*\//','', $this->getcss());
         $mediablocks = $this->parse_css_media_queries($text);
         if($type == 'class'){
             preg_match_all('/[^{}\/\*]*?\.'.$name.'\b.*?{.*?}/is', $text, $results);
