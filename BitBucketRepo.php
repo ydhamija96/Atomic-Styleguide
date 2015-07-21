@@ -425,7 +425,7 @@ class BitBucketRepo{
             foreach($mediablocks as $mediablock){
                 if(strpos($mediablock, $result) !== false){
                     preg_match('/@media.*?{/i', $mediablock, $prepends);
-                    $prepend .= $prepends[0] . PHP_EOL;
+                    $prepend .= $prepends[0] . PHP_EOL . '  ';
                     $postpend .= PHP_EOL.'}';
                     break;
                 }
