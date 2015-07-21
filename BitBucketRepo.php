@@ -97,6 +97,13 @@ class BitBucketRepo{
                 $result[] = $key;
             }
         }
+        usort($result, function($a, $b){
+            $adepth = substr_count($a, '/');
+            $bdepth = substr_count($b, '/');
+            if($adepth == $bdepth) {return 0;}
+            if($adepth > $bdepth) {return -1;}
+            if($adepth < $bdepth) {return 1;}
+        });
         return $result;
     }
     public function link($path){
@@ -353,7 +360,7 @@ class BitBucketRepo{
                 $text = '';
                 $old = $this->pwd();
                 $this->cd('/');
-                foreach($this->ls() as $file){
+                foreach($this->ls(true, true) as $file){
                     if(!$this->isDir($file)){
                         if(substr($file, -4) == '.css'){
                             $text .= $this->fixedcontents($file);
@@ -370,7 +377,7 @@ class BitBucketRepo{
                 $text = '';
                 $old = $this->pwd();
                 $this->cd('/');
-                foreach($this->ls() as $file){
+                foreach($this->ls(true, true) as $file){
                     if(!$this->isDir($file)){
                         if(substr($file, -4) == '.css'){
                             $text .= $this->contents($file);
@@ -411,17 +418,17 @@ class BitBucketRepo{
         $text = preg_replace('/\/\*.*?\*\//','', $this->getcss());
         $mediablocks = $this->parse_css_media_queries($text);
         if($type == 'class'){
-            preg_match_all('/[^{}\/\*]*?\.'.$name.'\b.*?{.*?}/is', $text, $results);
+            preg_match_all('/(\.'.$name.'\b.*?)(?=})/is', $text, $results);
         }
         if($type == 'id'){
-            preg_match_all('/[^{}\/\*]*?#'.$name.'\b.*?{.*?}/is', $text, $results);
+            preg_match_all('/(#'.$name.'\b.*?)(?=})/is', $text, $results);
         }
         if($type == 'tag'){
-            preg_match_all('/[^{}\/\*]*?\b(?<![.#])'.$name.'(?![\.#])\b.*?{.*?}/is', $text, $results);
+            preg_match_all('/[,}]\s*?('.$name.'\b(?!\.).*?)(?=})/is', $text, $results);
         }
-        foreach($results[0] as &$result){
+        foreach($results[1] as &$result){
             $prepend = '';
-            $postpend = '';
+            $postpend = '}';
             foreach($mediablocks as $mediablock){
                 if(strpos($mediablock, $result) !== false){
                     preg_match('/@media.*?{/i', $mediablock, $prepends);
@@ -433,7 +440,7 @@ class BitBucketRepo{
             $result = preg_replace('/,.*?{/is',' {', $result);
             $result = $prepend.$result.$postpend;
         }
-        return $results[0];
+        return $results[1];
     }
     public function findassets($text){
         $old = $this->pwd();

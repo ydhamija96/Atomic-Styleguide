@@ -348,12 +348,21 @@
                                         Just create a publicly viewable BitBucket repository (support for private ones is coming soon), store your design
                                         elements in there, and we'll take care of the rest. <br /><br />
                                         Just follow three rules:<br />
-                                        <ul>
-                                            <li>Store your .css and .js file(s) in the root directory. We'll separate out the relevant portions of the CSS for each individual component.</li>
+                                        <ol>
+                                            <li>
+                                                Store master .css and .js files in the root directory. If you want to have multiple .css files, you can use @import statements.
+                                                <ul>
+                                                    <li>
+                                                        Note that .css files in subdirectories are still loaded by the framework (in order to display any CSS that may be hidden behind @import statements). 
+                                                    </li>
+                                                    </li>
+                                                        However the root directory .css files (and any files they directly reference) are the only ones that are accessible via download buttons.
+                                                    </li>
+                                                </ul>
+                                            </li>
                                             <li>Store your component .html's like this: components/component-subgroup/individual-component.html</li> 
                                             <li>Store your template .html's like this: templates/individual-template.html</li>
-                                        </ul>
-                                        Other than that, go wild. Put images and assets in assets/images/img/i/a/b/c/quarentine/IlikeJuice/42/ -- we'll still find 'em.
+                                        </ol>
                                     </p>
                                 </div>
                             <?php                    
