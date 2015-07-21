@@ -411,13 +411,13 @@ class BitBucketRepo{
         $text = $this->getcss();
         $mediablocks = $this->parse_css_media_queries($text);
         if($type == 'class'){
-            preg_match_all('/[\w\.#>\s]*\.'.$name.'\b.*?{.*?}/is', $text, $results);
+            preg_match_all('/[\w\.#>\s\d_-]*\.'.$name.'\b.*?{.*?}/is', $text, $results);
         }
         if($type == 'id'){
-            preg_match_all('/[\w\.#>\s]*#'.$name.'\b.*?{.*?}/is', $text, $results);
+            preg_match_all('/[\w\.#>\s\d_-]*#'.$name.'\b.*?{.*?}/is', $text, $results);
         }
         if($type == 'tag'){
-            preg_match_all('/[\w\.#>\s]*\b(?<![.#])'.$name.'(?![\.#])\b[\w\.#\d]*?{.*?}/is', $text, $results);
+            preg_match_all('/[\w\.#>\s\d_-]*\b(?<![.#])'.$name.'(?![\.#])\b[\w\.#\d]*?{.*?}/is', $text, $results);
         }
         foreach($results[0] as &$result){
             $prepend = '';
