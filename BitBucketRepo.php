@@ -271,7 +271,7 @@ class BitBucketRepo{
     }
     private function fixRelatives($text){
         // Find all relative URLs
-        $patterns = ['/\b\s*((?:src|href)\s*=\s*(["\']))(\s*((?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\'"]+?.*?[^+\.]+?)\2)/i', '/\b\s*(url\s*\(\s*(["\']?)\s*)(((?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\'"]+?.*?[^+\.]+?)\s*\2\))/i', '/@(import\s*(["\']))(\s*((?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\'"]+?.*?[^+\.]+?)\2)/i'];
+        $patterns = ['/\b\s*((?:src|href)\s*=\s*(["\']))(\s*((?!#|\?|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\'"]+?.*?[^+\.]+?)\2)/i', '/\b\s*(url\s*\(\s*(["\']?)\s*)(((?!#|\?|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\'"]+?.*?[^+\.]+?)\s*\2\))/i', '/@(import\s*(["\']))(\s*((?!#|\?|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\'"]+?.*?[^+\.]+?)\2)/i'];
 
         // Find all matches
         $matches = array();
@@ -439,7 +439,7 @@ class BitBucketRepo{
         $old = $this->pwd();
         $this->cd('/');
         $assets = array();
-        $patterns = ['/\b\s*((?:src|href)\s*=\s*(["\']))(\s*((?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\'"]+?.*?[^+\.]+?)\2)/i', '/\b\s*(url\s*\(\s*(["\']?)\s*)(((?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\'"]+?.*?[^+\.]+?)\s*\2\))/i', '/@(import\s*(["\']))(\s*((?!#|\?|\/|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\'"]+?.*?[^+\.]+?)\2)/i'];
+        $patterns = ['/\b\s*((?:src|href)\s*=\s*(["\']))(\s*((?!#|\?|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\'"]+?.*?[^+\.]+?)\2)/i', '/\b\s*(url\s*\(\s*(["\']?)\s*)(((?!#|\?|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\'"]+?.*?[^+\.]+?)\s*\2\))/i', '/@(import\s*(["\']))(\s*((?!#|\?|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\'"]+?.*?[^+\.]+?)\2)/i'];
         $matches = array();
         foreach($patterns as $pattern){
             preg_match_all($pattern, $text, $result);
