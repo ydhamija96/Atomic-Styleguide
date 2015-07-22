@@ -255,29 +255,41 @@
                                                 <div class="well">
                                                     <h5>CSS:</h5>
                                                     <?php 
+                                                        $classblocks = array();
+                                                        $idblocks = array();
+                                                        $tagblocks = array();
                                                         $css = '';  // Used later to show assets only applicable to this CSS
                                                         $tags = $repo->findselectors($repo->contents($item));
                                                         echo "<pre><code class='css'>";
                                                             foreach($tags['classes'] as $class){
                                                                 foreach($repo->filtercss('class', $class) as $section){
-                                                                    echo $section;
-                                                                    echo "\n";
+                                                                    $classblocks[] = $section."\n";
                                                                     $css .= $section;
                                                                 }
                                                             }
                                                             foreach($tags['ids'] as $id){
                                                                 foreach($repo->filtercss('id', $id) as $section){
-                                                                    echo $section;
-                                                                    echo "\n";
+                                                                    $idblocks[] = $section."\n";
                                                                     $css .= $section;
                                                                 }
                                                             }
                                                             foreach($tags['tags'] as $tag){
                                                                 foreach($repo->filtercss('tag', $tag) as $section){
-                                                                    echo $section;
-                                                                    echo "\n";
+                                                                    $tagblocks[] = $section."\n";
                                                                     $css .= $section;
                                                                 }
+                                                            }
+                                                            $classblocks = array_unique($classblocks);
+                                                            $idblocks = array_unique($idblocks);
+                                                            $tagblocks = array_unique($tagblocks);
+                                                            foreach($classblocks as $block){
+                                                                echo $block;
+                                                            }
+                                                            foreach($idblocks as $block){
+                                                                echo $block;
+                                                            }
+                                                            foreach($tagblocks as $block){
+                                                                echo $block;
                                                             }
                                                         echo "</code></pre>";
                                                     ?>
@@ -414,29 +426,41 @@
                                     <div class="well">
                                         <h5>CSS:</h5>
                                         <?php 
+                                            $classblocks = array();
+                                            $idblocks = array();
+                                            $tagblocks = array();
                                             $css = '';  // Used later to show assets only applicable to this CSS
                                             $tags = $repo->findselectors($repo->contents($path));
                                             echo "<pre><code class='css'>";
                                                 foreach($tags['classes'] as $class){
                                                     foreach($repo->filtercss('class', $class) as $section){
-                                                        echo $section;
-                                                        echo "\n";
+                                                        $classblocks[] = $section."\n";
                                                         $css .= $section;
                                                     }
                                                 }
                                                 foreach($tags['ids'] as $id){
                                                     foreach($repo->filtercss('id', $id) as $section){
-                                                        echo $section;
-                                                        echo "\n";
+                                                        $idblocks[] = $section."\n";
                                                         $css .= $section;
                                                     }
                                                 }
                                                 foreach($tags['tags'] as $tag){
                                                     foreach($repo->filtercss('tag', $tag) as $section){
-                                                        echo $section;
-                                                        echo "\n";
+                                                        $tagblocks[] = $section."\n";
                                                         $css .= $section;
                                                     }
+                                                }
+                                                $classblocks = array_unique($classblocks);
+                                                $idblocks = array_unique($idblocks);
+                                                $tagblocks = array_unique($tagblocks);
+                                                foreach($classblocks as $block){
+                                                    echo $block;
+                                                }
+                                                foreach($idblocks as $block){
+                                                    echo $block;
+                                                }
+                                                foreach($tagblocks as $block){
+                                                    echo $block;
                                                 }
                                             echo "</code></pre>";
                                         ?>
