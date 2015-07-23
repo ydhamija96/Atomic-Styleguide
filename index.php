@@ -45,7 +45,6 @@
         }
     ?>
 </head>
-
 <?php if(isset($_GET['fullscreen']) && isset($_GET['path']) && $_GET['fullscreen'] == 'true') : ?>
     <body class="import">
     <?= $repo->contents($_GET['path']) ?>
@@ -344,9 +343,9 @@
                         elseif($repo->pwd() == '/'){   // If at document root.
                             ?>
                                 <div id="homeContent">
-                                    <h2>Welcome...</h2>
-                                    <h4>...to the Atomic Style Guide! :)</h4><br />
-                                    <h5>Here's what we do:</h5>
+                                    <h2>Welcome to the...</h2>
+                                    <h1>Atomic Style Guide!</h1><br />
+                                    <h3>Here's what we do:</h3>
                                     <p>
                                         In atomic designs (designs that are broken down into individual components/templates), 
                                         we are the style guide. We will display each component, show its HTML 
@@ -355,27 +354,34 @@
                                         Each element is directly accessed from where it is stored, so there is no updating
                                         or CMS to worry about. We will always display the latest and greatest version of every element.
                                     </p><br /><br />
-                                    <h5>Here's how to use us:</h5>
+                                    <h3>Here's how to use us:</h3>
                                     <p>
                                         Just create a publicly viewable BitBucket repository (support for private ones is coming soon), store your design
                                         elements in there, and we'll take care of the rest. <br /><br />
-                                        Just follow three rules:<br />
+                                        Two Rules:<br />
                                         <ol>
-                                            <li>
-                                                Store master .css and .js files in the root directory. If you want to have multiple .css files, you can use @import statements.
-                                                <ul>
-                                                    <li>
-                                                        Note that .css files in subdirectories are still loaded by the framework (in order to display any CSS that may be hidden behind @import statements). 
-                                                    </li>
-                                                    </li>
-                                                        However the root directory .css files (and any files they directly reference) are the only ones that are accessible via download buttons.
-                                                    </li>
-                                                </ul>
-                                            </li>
-                                            <li>Store your component .html's like this: components/component-subgroup/individual-component.html</li> 
-                                            <li>Store your template .html's like this: templates/individual-template.html</li>
+                                            <li>Store your component <span>.html</span>'s like this (from the root dir): <span>components/component-subgroup/individual-component.html</span></li> 
+                                            <li>Store your template <span>.html</span>'s like this (from the root dir): <span>templates/individual-template.html</span></li>
                                         </ol>
-                                    </p>
+                                        No more rules! Put your CSS where you want. We'll find it. Put your JS where you want. We'll find it. Images? Fonts? We'll find 'em.
+                                    </p><br /><br />
+                                    <h3>Here's some more information:</h3>
+                                    <ul>
+                                        <li>
+                                            The file <span>atomicstyleguide-autoload.html</span> in the root directory will be autoloaded to the bottom of the styleguide.<br />
+                                            Only use it for invisible stuff (like importing external javascript via <span>&lt;script&gt;</span> tags).
+                                        </li>
+                                        <li>
+                                            Javascript (unless inline) will not work unless in fullscreen mode (to make elements behave in their little boxes).
+                                        </li>
+                                        <li>
+                                            You cannot manually specify the order to load <span>.css</span> files. By default, they are loaded in order starting from the deepest subdirectory to the root.<br />
+                                            If you'd like to have your <span>.css</span> load in a specific order, put it all in one file. Or put a <span>master.css</span> in the root that imports everything in the right order.
+                                        </li>
+                                        <li>
+                                            The answer to the everything is not <span>42</span>. It is, rather, the <span>Firefly</span> TV series. But the evils of Earth had it cancelled.
+                                        </li>
+                                    </ul>
                                 </div>
                             <?php                    
                         }
@@ -508,6 +514,13 @@
         </div>
         <?php endif; ?>
         <?php
+
+            // Autoload the atomicstyleguide-autoload.html file:
+            ?>
+                <div style="height:0; width:0; overflow:hidden; display:none;">
+                    <?= $repo->fixedcontents('/atomicstyleguide-autoload.html') ?>
+                </div>
+            <?php
 
             // Output javascript inline:
             if(isset($_GET['fullscreen']) && $_GET['fullscreen'] == 'true'){

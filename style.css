@@ -95,3 +95,11 @@ body > #content > .singleElement > .element > .collapse pre{
 body > #content > .singleElement > .element > .collapsing pre{
     font-size:11px;
 }
+#homeContent li > span{
+    font-family: monospace;
+    background:#EEEEEE;
+    padding-left:5px;
+    padding-right:5px;
+    color:black;
+    border:1px solid #ffafaf;
+}
