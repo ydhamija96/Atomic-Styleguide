@@ -518,16 +518,18 @@
         <?php
 
             // Output javascript inline:
-            $oldlocationlink = $repo->pwd();
-            $repo->cd('/');
-            foreach($repo->ls() as $file){
-                if(!$repo->isDir($file)){
-                    if(substr($file, -3) == '.js'){
-                        ?><script><?= $repo->fixedcontents($file) ?></script><?php
+            if(isset($_GET['fullscreen']) && $_GET['fullscreen'] == 'true'){
+                $oldlocationlink = $repo->pwd();
+                $repo->cd('/');
+                foreach($repo->ls() as $file){
+                    if(!$repo->isDir($file)){
+                        if(substr($file, -3) == '.js'){
+                            ?><script><?= $repo->fixedcontents($file) ?></script><?php
+                        }
                     }
                 }
+                $repo->cd($oldlocationlink);
             }
-            $repo->cd($oldlocationlink);
         ?>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>

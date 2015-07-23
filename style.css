@@ -6880,7 +6880,11 @@
 
 
 
-
+body{
+	margin:0;
+	padding:0;
+	border:0;
+}
 #atomic-styleguide-body{
     background: #CCCCCC;
 }
