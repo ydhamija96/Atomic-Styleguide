@@ -3,8 +3,8 @@ class BitBucketRepo{
     private $directoryListing = array();
     private $parentURL;
     private $currentLoc = array();
-    private $mainCSS;
-    private $fixedCSS;
+    private $mainCSS = 0;
+    private $fixedCSS = 0;
     private $nonce;
     function __construct($url){
         $this->parentURL = $url;
@@ -348,16 +348,22 @@ class BitBucketRepo{
         $tags = array_unique($tags);
         return array('classes' => $classes, 'ids' => $ids, 'tags' => $tags);
     }
+    private function fixCSS($text){
+        $text = preg_replace('/\/\*.*?\*\//','', $text);
+        $text = "p{} ".$text;
+        return preg_replace('/([},][^@\w\.#]*?)(?!\.import)([\w\.#])/is', '${1} .import ${2}', $text);
+        return preg_replace('/(@[^{]*?{[^@\w\.#]*?)(?!\.import)([\w\.#])/is', '${1} .import ${2}', $text);
+    }
     public function getcss($fix = false){
         if($fix){
-            if($this->fixedCSS === 0){
+            if($this->fixedCSS == 0){
                 $text = '';
                 $old = $this->pwd();
                 $this->cd('/');
                 foreach($this->ls(true, true) as $file){
                     if(!$this->isDir($file)){
                         if(substr($file, -4) == '.css'){
-                            $text .= $this->fixedcontents($file);
+                            $text .= $this->fixCSS($this->fixedcontents($file));
                         }
                     }
                 }
@@ -367,7 +373,7 @@ class BitBucketRepo{
             return $this->fixedCSS;
         }
         else{
-            if($this->mainCSS === 0){
+            if($this->mainCSS == 0){
                 $text = '';
                 $old = $this->pwd();
                 $this->cd('/');
