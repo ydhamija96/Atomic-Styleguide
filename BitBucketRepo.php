@@ -332,6 +332,7 @@ class BitBucketRepo{
 
         preg_match_all('/class=[\'"](.*?)[\'"]/is',$text, $current);
         foreach($current[1] as $string){
+            $string = trim($string);
             $each = preg_split('/\s+/', $string);
             $classes = array_merge($classes, $each);
         }
