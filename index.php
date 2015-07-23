@@ -358,30 +358,51 @@
                                     <p>
                                         Just create a publicly viewable BitBucket repository (support for private ones is coming soon), store your design
                                         elements in there, and we'll take care of the rest. <br /><br />
-                                        Two Rules:<br />
-                                        <ol>
-                                            <li>Store your component <span>.html</span>'s like this (from the root dir): <span>components/component-subgroup/individual-component.html</span></li> 
-                                            <li>Store your template <span>.html</span>'s like this (from the root dir): <span>templates/individual-template.html</span></li>
-                                        </ol>
-                                        No more rules! Put your CSS where you want. We'll find it. Put your JS where you want. We'll find it. Images? Fonts? We'll find 'em.
-                                    </p><br /><br />
-                                    <h3>Here's some more information:</h3>
-                                    <ul>
-                                        <li>
-                                            The file <span>atomicstyleguide-autoload.html</span> in the root directory will be autoloaded to the bottom of the styleguide.<br />
-                                            Only use it for invisible stuff (like importing external javascript via <span>&lt;script&gt;</span> tags).
-                                        </li>
-                                        <li>
-                                            Javascript (unless inline) will not work unless in fullscreen mode (to make elements behave in their little boxes).
-                                        </li>
-                                        <li>
-                                            You cannot manually specify the order to load <span>.css</span> files. By default, they are loaded in order starting from the deepest subdirectory to the root.<br />
-                                            If you'd like to have your <span>.css</span> load in a specific order, put it all in one file. Or put a <span>master.css</span> in the root that imports everything in the right order.
-                                        </li>
-                                        <li>
-                                            The answer to the everything is not <span>42</span>. It is, rather, the <span>Firefly</span> TV series. But the evils of Earth had it cancelled.
-                                        </li>
-                                    </ul>
+                                        <ul>
+                                            <li>
+                                                HTML:
+                                                <ul>
+                                                    <li>Store your component HTML files like this (from the root dir): <span>/components/[component-subgroup]/[individual-component].html</span></li> 
+                                                    <li>Store your template HTML files like this (from the root dir): <span>/templates/[individual-template].html</span></li>
+                                                </ul>
+                                            </li>
+                                            <li>
+                                                CSS:
+                                                <ul>
+                                                    <li>
+                                                        CSS files are loaded in top-down order starting from the deepest subdirectory to the root.
+                                                        <ul>
+                                                            <li>I.e. <span>/components/component-subgroup/specific.css</span> appears <strong>before</strong> <span>/components/general.css</span></li> 
+                                                            (and would be overridden).
+                                                        </ul>
+                                                    </li>
+                                                    <li>
+                                                        If you'd like to have your CSS load in a specific order, either put it all in one file,
+                                                        or put a single CSS file in the root that imports others from subdirectories in the 
+                                                        right order (via <span>@import</span>).
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li>
+                                                JavaScript:
+                                                <ul>
+                                                    <li>
+                                                        Javascript can be included in one of two ways:
+                                                        <ul>
+                                                            <li>
+                                                                It can be included inline in any template or component (but it would then apply only to that template/component).
+                                                            </li>
+                                                            <li>
+                                                                A special file, <span>/atomicstyleguide-autoload.html</span>, if it exists, is autoloaded
+                                                                by the styleguide (but is invisible). You can keep separate Javascript files and load them there
+                                                                (via <span>&lt;script src=...&gt;</span>), or just go inline.
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </p>
                                 </div>
                             <?php                    
                         }
@@ -513,29 +534,6 @@
             <?php endif; ?>
         </div>
         <?php endif; ?>
-        <?php
-
-            // Autoload the atomicstyleguide-autoload.html file:
-            ?>
-                <div style="height:0; width:0; overflow:hidden; display:none;">
-                    <?= $repo->fixedcontents('/atomicstyleguide-autoload.html') ?>
-                </div>
-            <?php
-
-            // Output javascript inline:
-            if(isset($_GET['fullscreen']) && $_GET['fullscreen'] == 'true'){
-                $oldlocationlink = $repo->pwd();
-                $repo->cd('/');
-                foreach($repo->ls() as $file){
-                    if(!$repo->isDir($file)){
-                        if(substr($file, -3) == '.js'){
-                            ?><script><?= $repo->fixedcontents($file) ?></script><?php
-                        }
-                    }
-                }
-                $repo->cd($oldlocationlink);
-            }
-        ?>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
         <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
@@ -551,6 +549,15 @@
                 $('#atomic-styleguide-search-button').css('background-color', (search_expanded)?'inherit':'#CCCCCC');
             });
         </script>
+        <?php
+
+            // Autoload the atomicstyleguide-autoload.html file:
+            ?>
+                <div style="height:0; width:0; overflow:hidden; display:none;">
+                    <?= $repo->fixedcontents('/atomicstyleguide-autoload.html') ?>
+                </div>
+            <?php
+        ?>
     </body>
 
 </html>
