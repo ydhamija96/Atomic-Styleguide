@@ -261,23 +261,17 @@
                                                         $css = '';  // Used later to show assets only applicable to this CSS
                                                         $tags = $repo->findselectors($repo->contents($item));
                                                         echo "<pre><code class='css'>";
-                                                            foreach($tags['classes'] as $class){
-                                                                foreach($repo->filtercss('class', $class) as $section){
-                                                                    $classblocks[] = $section."\n";
-                                                                    $css .= $section;
-                                                                }
+                                                            foreach($repo->filtercss('class', $tags['classes']) as $section){
+                                                                $classblocks[] = $section."\n";
+                                                                $css .= $section;
                                                             }
-                                                            foreach($tags['ids'] as $id){
-                                                                foreach($repo->filtercss('id', $id) as $section){
-                                                                    $idblocks[] = $section."\n";
-                                                                    $css .= $section;
-                                                                }
+                                                            foreach($repo->filtercss('id', $tags['ids']) as $section){
+                                                                $idblocks[] = $section."\n";
+                                                                $css .= $section;
                                                             }
-                                                            foreach($tags['tags'] as $tag){
-                                                                foreach($repo->filtercss('tag', $tag) as $section){
-                                                                    $tagblocks[] = $section."\n";
-                                                                    $css .= $section;
-                                                                }
+                                                            foreach($repo->filtercss('tag', $tags['tags']) as $section){
+                                                                $tagblocks[] = $section."\n";
+                                                                $css .= $section;
                                                             }
                                                             $classblocks = array_unique($classblocks);
                                                             $idblocks = array_unique($idblocks);
@@ -432,23 +426,17 @@
                                             $css = '';  // Used later to show assets only applicable to this CSS
                                             $tags = $repo->findselectors($repo->contents($path));
                                             echo "<pre><code class='css'>";
-                                                foreach($tags['classes'] as $class){
-                                                    foreach($repo->filtercss('class', $class) as $section){
-                                                        $classblocks[] = $section."\n";
-                                                        $css .= $section;
-                                                    }
+                                                foreach($repo->filtercss('class', $tags['classes']) as $section){
+                                                    $classblocks[] = $section."\n";
+                                                    $css .= $section;
                                                 }
-                                                foreach($tags['ids'] as $id){
-                                                    foreach($repo->filtercss('id', $id) as $section){
-                                                        $idblocks[] = $section."\n";
-                                                        $css .= $section;
-                                                    }
+                                                foreach($repo->filtercss('id', $tags['ids']) as $section){
+                                                    $idblocks[] = $section."\n";
+                                                    $css .= $section;
                                                 }
-                                                foreach($tags['tags'] as $tag){
-                                                    foreach($repo->filtercss('tag', $tag) as $section){
-                                                        $tagblocks[] = $section."\n";
-                                                        $css .= $section;
-                                                    }
+                                                foreach($repo->filtercss('tag', $tags['tags']) as $section){
+                                                    $tagblocks[] = $section."\n";
+                                                    $css .= $section;
                                                 }
                                                 $classblocks = array_unique($classblocks);
                                                 $idblocks = array_unique($idblocks);

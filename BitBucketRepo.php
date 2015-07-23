@@ -406,17 +406,30 @@ class BitBucketRepo{
         }
         return $mediaBlocks;
     }
-    public function filtercss($type, $name){
+    public function filtercss($type, $names){
         $text = preg_replace('/\/\*.*?\*\//','', $this->getcss());
         $mediablocks = $this->parse_css_media_queries($text);
+        $namesregex = '(?:';
+        if(!empty($names)){
+            foreach($names as $name){
+                if(trim($name) != ''){
+                    $namesregex .= preg_quote($name) . '|';
+                }
+            }
+            $namesregex = rtrim($namesregex, '|');
+            $namesregex .= ')';
+        }
+        else{
+            return $text;
+        }
         if($type == 'class'){
-            preg_match_all('/(\.'.$name.'\b.*?)(?=})/is', $text, $results);
+            preg_match_all('/(\.'.$namesregex.'\b.*?)(?=})/is', $text, $results);
         }
         if($type == 'id'){
-            preg_match_all('/(#'.$name.'\b.*?)(?=})/is', $text, $results);
+            preg_match_all('/(#'.$namesregex.'\b.*?)(?=})/is', $text, $results);
         }
         if($type == 'tag'){
-            preg_match_all('/[,}]\s*?('.$name.'\b(?!\.).*?)(?=})/is', $text, $results);
+            preg_match_all('/[,}]\s*?('.$namesregex.'\b(?!\.).*?)(?=})/is', $text, $results);
         }
         foreach($results[1] as &$result){
             $prepend = '';
