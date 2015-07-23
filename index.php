@@ -24,7 +24,12 @@
         }
 
         // Output CSS inline:
-        ?><style><?= $repo->getcss(true) ?></style><?php
+        if(isset($_GET['fullscreen']) && $_GET['fullscreen'] == 'true'){
+            ?><style><?= $repo->getcss(true) ?></style><?php
+        }
+        else{
+            ?><style><?= str_replace('position:fixed', 'position:relative', $repo->getcss(true)) ?></style><?php
+        }
 
         // Traverse the repo to proper location:
         if(isset($_GET['path']) && trim($_GET['path']) != ''){
@@ -59,7 +64,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="?">Atomic Style Guide</a>
+                    <a class="navbar-brand" href="?"><i class="fa fa-simplybuilt "></i>&nbsp;  Atomic Style Guide</a>
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
@@ -343,60 +348,60 @@
                         elseif($repo->pwd() == '/'){   // If at document root.
                             ?>
                                 <div id="homeContent">
+                                    <i style="margin-top:10px" class="pull-left fa fa-simplybuilt fa-5x fa-border"></i> 
                                     <h2>Welcome to the...</h2>
                                     <h1>Atomic Style Guide!</h1><br />
-                                    <h3>Here's what we do:</h3>
+                                    <h3>What it does:</h3>
                                     <p>
                                         In atomic designs (designs that are broken down into individual components/templates), 
-                                        we are the style guide. We will display each component, show its HTML 
-                                        and CSS code, and allow it (and each or all of its dependencies) to be downloaded at the click of
+                                        this is the style guide. It will display each component, show its HTML 
+                                        and CSS code, and allow it (and each of its dependencies) to be downloaded at the click of
                                         a button.<br /><br />
                                         Each element is directly accessed from where it is stored, so there is no updating
-                                        or CMS to worry about. We will always display the latest and greatest version of every element.
+                                        or CMS to worry about. It will always display the latest and greatest version of every element.
                                     </p><br /><br />
-                                    <h3>Here's how to use us:</h3>
+                                    <h3>How to use it:</h3>
                                     <p>
-                                        Just create a publicly viewable BitBucket repository (support for private ones is coming soon), store your design
-                                        elements in there, and we'll take care of the rest. <br /><br />
+                                        Just create a publicly viewable BitBucket repository (support for private ones is coming soon) and store your design
+                                        elements in there. <br />
                                         <ul>
                                             <li>
-                                                HTML:
+                                                <strong>HTML:</strong>
                                                 <ul>
-                                                    <li>Store your component HTML files like this (from the root dir): <span>/components/[component-subgroup]/[individual-component].html</span></li> 
-                                                    <li>Store your template HTML files like this (from the root dir): <span>/templates/[individual-template].html</span></li>
+                                                    <li>Store your components' HTML files like this: <span>/components/[component-subgroup]/[individual-component].html</span>.</li> 
+                                                    <li>Store your templates' HTML files like this: <span>/templates/[individual-template].html</span>.</li>
                                                 </ul>
                                             </li>
                                             <li>
-                                                CSS:
+                                                <strong>CSS:</strong>
                                                 <ul>
                                                     <li>
                                                         CSS files are loaded in top-down order starting from the deepest subdirectory to the root.
                                                         <ul>
-                                                            <li>I.e. <span>/components/component-subgroup/specific.css</span> appears <strong>before</strong> <span>/components/general.css</span></li> 
+                                                            <li>Example: <span>/components/component-subgroup/stylesheet1.css</span> appears <strong>before</strong> <span>/components/stylesheet2.css</span></li> 
                                                             (and would be overridden).
                                                         </ul>
                                                     </li>
                                                     <li>
-                                                        If you'd like to have your CSS load in a specific order, either put it all in one file,
-                                                        or put a single CSS file in the root that imports others from subdirectories in the 
-                                                        right order (via <span>@import</span>).
+                                                        If you'd like to have your CSS load in a specific order, you have two options:
+                                                        <ul>
+                                                            <li>Put it all in one file. This is the preferred way.</li>
+                                                            <li>Put a single CSS file in the root that imports other CSS files from subdirectories in the 
+                                                            preferred order (via <span>@import</span>).</li>
+                                                        </ul>
                                                     </li>
                                                 </ul>
                                             </li>
                                             <li>
-                                                JavaScript:
+                                                <strong>JavaScript:</strong>
                                                 <ul>
                                                     <li>
-                                                        Javascript can be included in one of two ways:
+                                                        Javascript can be loaded through this file: <span>/atomicstyleguide-autoload.html</span>
                                                         <ul>
-                                                            <li>
-                                                                It can be included inline in any template or component (but it would then apply only to that template/component).
-                                                            </li>
-                                                            <li>
-                                                                A special file, <span>/atomicstyleguide-autoload.html</span>, if it exists, is autoloaded
-                                                                by the styleguide (but is invisible). You can keep separate Javascript files and load them there
-                                                                (via <span>&lt;script src=...&gt;</span>), or just go inline.
-                                                            </li>
+                                                            <li>If it exists, it will be autoloaded by the styleguide.</li>
+                                                            <li>Javascript can be included there inline.</li>
+                                                            <li>You can also keep separate Javascript files and load them there (via <span>&lt;script src=...&gt;</span>). This is the preferred way.</li>
+                                                            <li>Note that this file is <strong>only</strong> loaded in fullscreen mode.</li>
                                                         </ul>
                                                     </li>
                                                 </ul>
@@ -554,7 +559,14 @@
             // Autoload the atomicstyleguide-autoload.html file:
             ?>
                 <div style="height:0; width:0; overflow:hidden; display:none;">
-                    <?= $repo->fixedcontents('/atomicstyleguide-autoload.html') ?>
+                    <?php
+                        $oldlocation = $repo->pwd();
+                        $repo->cd('/');
+                        if(isset($_GET['fullscreen']) && $_GET['fullscreen'] == 'true'){
+                            echo $repo->fixedcontents('/atomicstyleguide-autoload.html');
+                        }
+                        $repo->cd($oldlocation);
+                    ?>
                 </div>
             <?php
         ?>
