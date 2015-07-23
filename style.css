@@ -56,8 +56,6 @@ body > #content > .singleElement{
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     border-radius: 5px;
-    min-height:300px;
-    min-width:300px;
 }
 body > #content{
     width:100%;

@@ -165,7 +165,7 @@
                     $search = htmlspecialchars($_GET['search']);
                 ?>
                 <div class="singleElement">
-                    <h5>Closest things to '<?=$search?>' we could find:</h5>
+                    <h3>Closest things to '<?=$search?>' we could find:</h3>
                 </div>
                 <?php
                     function cmp($a, $b){
