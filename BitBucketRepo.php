@@ -359,16 +359,7 @@ class BitBucketRepo{
         if($fix){
             if($this->fixedCSS == 0){
                 $text = '';
-                $old = $this->pwd();
-                $this->cd('/');
-                foreach($this->ls(true, true) as $file){
-                    if(!$this->isDir($file)){
-                        if(substr($file, -4) == '.css'){
-                            $text .= $this->fixCSS($this->fixedcontents($file));
-                        }
-                    }
-                }
-                $this->cd($old);
+                $text .= $this->fixCSS($this->fixRelatives($this->mainCSS));
                 $this->fixedCSS = $text;
             }
             return $this->fixedCSS;
