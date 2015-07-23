@@ -351,8 +351,9 @@ class BitBucketRepo{
     private function fixCSS($text){
         $text = preg_replace('/\/\*.*?\*\//','', $text);
         $text = "p{} ".$text;
-        return preg_replace('/([},][^@\w\.#]*?)(?!\.import)([\w\.#])/is', '${1} .import ${2}', $text);
-        return preg_replace('/(@[^{]*?{[^@\w\.#]*?)(?!\.import)([\w\.#])/is', '${1} .import ${2}', $text);
+        $text = preg_replace('/([},][^@\w\.#]*?)(?!\.import)([\w\.#])/is', '${1} .import ${2}', $text);
+        $text = preg_replace('/(@[^{]*?{[^@\w\.#]*?)(?!\.import)([\w\.#])/is', '${1} .import ${2}', $text);
+        return $text;
     }
     public function getcss($fix = false){
         if($fix){
