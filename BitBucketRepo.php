@@ -349,17 +349,21 @@ class BitBucketRepo{
         return array('classes' => $classes, 'ids' => $ids, 'tags' => $tags);
     }
     private function fixCSS($text){
+        $old = $this->pwd();
+        $this->cd('/');
         $text = preg_replace('/\/\*.*?\*\//','', $text);
+        $text = $this->fixRelatives($text);
         $text = "p{} ".$text;
         $text = preg_replace('/([},][^@\w\.#]*?)(?!\.import)([\w\.#])/is', '${1} .import ${2}', $text);
         $text = preg_replace('/(@[^{]*?{[^@\w\.#]*?)(?!\.import)([\w\.#])/is', '${1} .import ${2}', $text);
+        $this->cd($old);
         return $text;
     }
     public function getcss($fix = false){
         if($fix){
             if($this->fixedCSS == 0){
                 $text = '';
-                $text .= $this->fixCSS($this->fixRelatives($this->getcss()));
+                $text .= $this->fixCSS($this->getcss(false));
                 $this->fixedCSS = $text;
             }
             return $this->fixedCSS;
