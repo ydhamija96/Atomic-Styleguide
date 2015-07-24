@@ -435,54 +435,54 @@
             });
         </script>
         <script>
-            var htmlNum = 1;
             for(var i=1; i <= paths.length; ++i){
                 $.ajax({ url: 'functions.php',
                     data: {
                         action: 'relevantHTML',
+                        input: i,
                         path: paths[i-1]
                     },
                     type: 'post',
                     success: function(output){
-                        var dom = $('#htmlCode'+htmlNum);
-                        ++htmlNum;
-                        dom.html(output);
+                        var returned = jQuery.parseJSON(output);
+                        var dom = $('#htmlCode'+returned.Input);
+                        dom.html(returned.Output);
                         dom.each(function(i, block) {
                             hljs.highlightBlock(block);
                         });
                     }
                 });
             }
-            var cssNum = 1;
             for(var i=1; i <= paths.length; ++i){
                 $.ajax({ url: 'functions.php',
                     data: {
                         action: 'relevantCSS',
+                        input: i,
                         path: paths[i-1]
                     },
                     type: 'post',
                     success: function(output){
-                        var dom = $('#cssCode'+cssNum);
-                        ++cssNum;
-                        dom.html(output);
+                        var returned = jQuery.parseJSON(output);
+                        var dom = $('#cssCode'+returned.Input);
+                        dom.html(returned.Output);
                         dom.each(function(i, block) {
                             hljs.highlightBlock(block);
                         });
                     }
                 });
             }
-            var assetsNum = 1;
             for(var i=1; i <= paths.length; ++i){
                 $.ajax({ url: 'functions.php',
                     data: {
                         action: 'relevantAssets',
+                        input: i,
                         path: paths[i-1]
                     },
                     type: 'post',
                     success: function(output){
-                        var dom = $('#assetsCode'+assetsNum);
-                        ++assetsNum;
-                        dom.html(output);
+                        var returned = jQuery.parseJSON(output);
+                        var dom = $('#assetsCode'+returned.Input);
+                        dom.html(returned.Output);
                     }
                 });
             }
