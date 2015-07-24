@@ -67,7 +67,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand atomic-styleguide-brand" href="?"><i class="atomicstyleguide-navbar-logo atomicstyleguide-logo fa-flip-vertical fa fa-simplybuilt "></i>&nbsp;  Atomic Style Guide</a>
+                    <a class="navbar-brand atomic-styleguide-brand" href="?"><i class="atomicstyleguide-navbar-logo atomicstyleguide-logo fa-flip-vertical fa fa-simplybuilt"></i>&nbsp;  Atomic Style Guide</a>
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
@@ -287,7 +287,7 @@
                         elseif($repo->pwd() == '/'){   // If at document root.
                             ?>
                                 <div id="homeContent">
-                                    <i style="margin-top:10px" id="logo" class="atomicstyleguide-logo fa-flip-vertical pull-left fa fa-simplybuilt fa-5x fa-border"></i> 
+                                    <i style="margin-top:10px; border-color:#996699;" id="logo" class="atomicstyleguide-logo fa-flip-vertical pull-left fa fa-simplybuilt fa-5x fa-border"></i> 
                                     <h2>Welcome to the...</h2>
                                     <h1>Atomic Style Guide!</h1><br />
                                     <h3>What it does:</h3>
