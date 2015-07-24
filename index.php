@@ -55,7 +55,7 @@
 </head>
 <?php if(isset($_GET['fullscreen']) && isset($_GET['path']) && $_GET['fullscreen'] == 'true') : ?>
     <body class="import">
-    <?= $repo->contents($_GET['path']) ?>
+    <?= $repo->fixedcontents($_GET['path']) ?>
 <?php else: ?>
     <body id="atomic-styleguide-body">
         <nav class="navbar navbar-default navbar-fixed-top">
@@ -67,7 +67,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="?"><i class="atomicstyleguide-logo fa-flip-vertical fa fa-simplybuilt "></i>&nbsp;  Atomic Style Guide</a>
+                    <a class="navbar-brand atomic-styleguide-brand" href="?"><i class="atomicstyleguide-navbar-logo atomicstyleguide-logo fa-flip-vertical fa fa-simplybuilt "></i>&nbsp;  Atomic Style Guide</a>
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
@@ -432,6 +432,14 @@
             });
             $('a').on("click",function(){
                 window.stop();
+            });
+            $(".atomic-styleguide-brand").on({
+                mouseenter: function () {
+                    $(".atomicstyleguide-navbar-logo").addClass("fa-pulse");
+                },
+                mouseleave: function () {
+                    $(".atomicstyleguide-navbar-logo").removeClass("fa-pulse");
+                }
             });
         </script>
         <script>
