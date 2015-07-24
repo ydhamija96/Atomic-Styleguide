@@ -49,6 +49,9 @@
             $repo->clearDownloads(100);
         }
     ?>
+    <script>
+        var paths = [];
+    </script>
 </head>
 <?php if(isset($_GET['fullscreen']) && isset($_GET['path']) && $_GET['fullscreen'] == 'true') : ?>
     <body class="import">
@@ -64,7 +67,7 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="?"><i class="fa fa-simplybuilt "></i>&nbsp;  Atomic Style Guide</a>
+                    <a class="navbar-brand" href="?"><i class="atomicstyleguide-logo fa-flip-vertical fa fa-simplybuilt "></i>&nbsp;  Atomic Style Guide</a>
                 </div>
                 <div id="navbar" class="navbar-collapse collapse">
                     <ul class="nav navbar-nav">
@@ -245,90 +248,26 @@
                                             </button>
                                         </div>
                                         <div class="element">
+                                            <script>
+                                                paths.push("<?= $item ?>");
+                                            </script>
                                             <div class="import"><?php echo $repo->fixedcontents($item); ?></div>
                                             <div class="collapse" id="html<?= $counter ?>">
                                                 <div class="well">
                                                     <h5>HTML:</h5>
-                                                    <pre><code class='html'><?= htmlspecialchars($repo->contents($item)) ?></code></pre>
-                                                    <?php 
-                                                        $html=$repo->contents($item);   // Used later to show assets only applicable to this HTML
-                                                    ?>
+                                                    <pre><code id="htmlCode<?= $counter ?>" class='html'><i class="fa fa-cog fa-3x fa-spin"></i> Loading...</code></pre>
                                                 </div>
                                             </div>
                                             <div class="collapse" id="css<?= $counter ?>">
                                                 <div class="well">
                                                     <h5>CSS:</h5>
-                                                    <?php 
-                                                        $classblocks = array();
-                                                        $idblocks = array();
-                                                        $tagblocks = array();
-                                                        $css = '';  // Used later to show assets only applicable to this CSS
-                                                        $tags = $repo->findselectors($repo->contents($item));
-                                                        echo "<pre><code class='css'>";
-                                                            if(!empty($tags['classes'])){
-                                                                foreach($repo->filtercss('class', $tags['classes']) as $section){
-                                                                    $classblocks[] = $section."\n";
-                                                                    $css .= $section;
-                                                                }
-                                                            }
-                                                            if(!empty($tags['ids'])){
-                                                                foreach($repo->filtercss('id', $tags['ids']) as $section){
-                                                                    $idblocks[] = $section."\n";
-                                                                    $css .= $section;
-                                                                }
-                                                            }
-                                                            if(!empty($tags['tags'])){
-                                                                foreach($repo->filtercss('tag', $tags['tags']) as $section){
-                                                                    $tagblocks[] = $section."\n";
-                                                                    $css .= $section;
-                                                                }
-                                                            }
-                                                            $classblocks = array_unique($classblocks);
-                                                            $idblocks = array_unique($idblocks);
-                                                            $tagblocks = array_unique($tagblocks);
-                                                            foreach($classblocks as $block){
-                                                                echo $block;
-                                                            }
-                                                            foreach($idblocks as $block){
-                                                                echo $block;
-                                                            }
-                                                            foreach($tagblocks as $block){
-                                                                echo $block;
-                                                            }
-                                                        echo "</code></pre>";
-                                                    ?>
+                                                    <pre><code id='cssCode<?= $counter ?>' class='css'><i class="fa fa-cog fa-3x fa-spin"></i> Loading...</code></pre>
                                                 </div>
                                             </div>
                                             <div class="collapse" id="assets<?= $counter ?>">
                                                 <div class="well">
                                                     <h5>Assets:</h5>
-                                                    <?php
-                                                        // Output the root css and js files:
-                                                        $oldlocation = $repo->pwd();
-                                                        $repo->cd('/');
-                                                        foreach($repo->ls() as $file){
-                                                            if(!$repo->isDir($file)){
-                                                                if(substr($file, -3) == '.js' || substr($file, -4) == '.css'){
-                                                                    ?><a href="<?= $repo->link($file) ?>" download="<?= $file ?>"><?= $file ?></a><br /><?php
-                                                                }
-                                                            }
-                                                        }
-                                                        $repo->cd($oldlocation);
-
-                                                        // Output the file itself:
-                                                        ?><a href="<?= $repo->link($item) ?>" download="<?= $item ?>"><?= $item ?></a><br /><?php
-
-                                                        // Output any assets:
-                                                        $oldlocation = $repo->pwd();
-                                                        $repo->cd('/');
-                                                        $assets = $repo->findassets($html.'|'.$css);
-                                                        foreach($assets as $asset){
-                                                            $output = explode('/', $asset);
-                                                            $output = end(array_values($output));
-                                                            ?><a href="<?= $repo->link($asset) ?>" download="<?= $asset ?>"><?= $output ?></a><br /><?php
-                                                        }
-                                                        $repo->cd($oldlocation);
-                                                    ?>
+                                                    <p id="assetsCode<?= $counter ?>"><i class="fa fa-cog fa-3x fa-spin"></i> Loading...</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -348,7 +287,7 @@
                         elseif($repo->pwd() == '/'){   // If at document root.
                             ?>
                                 <div id="homeContent">
-                                    <i style="margin-top:10px" class="pull-left fa fa-simplybuilt fa-5x fa-border"></i> 
+                                    <i style="margin-top:10px" id="logo" class="atomicstyleguide-logo fa-flip-vertical pull-left fa fa-simplybuilt fa-5x fa-border"></i> 
                                     <h2>Welcome to the...</h2>
                                     <h1>Atomic Style Guide!</h1><br />
                                     <h3>What it does:</h3>
@@ -389,6 +328,9 @@
                                                             <li>Put a single CSS file in the root that imports other CSS files from subdirectories in the 
                                                             preferred order (via <span>@import</span>).</li>
                                                         </ul>
+                                                    </li>
+                                                    <li>
+                                                        Do not leave a <span>&lt;link rel="stylesheet" type="text/css" href="[cssFile].css"&gt;</span> in your HTML code.
                                                     </li>
                                                 </ul>
                                             </li>
@@ -445,89 +387,25 @@
                                 </button>
                             </div>
                             <div class="element">
+                                <script>
+                                    paths.push("<?= $item ?>");
+                                </script>
                                 <div class="collapse" id="html">
                                     <div class="well">
                                         <h5>HTML:</h5>
-                                        <pre><code class='html'><?= htmlspecialchars($repo->contents($path)) ?></code></pre>
-                                        <?php 
-                                            $html=$repo->contents($path);   // Used later to show assets only applicable to this HTML
-                                        ?>
+                                        <pre><code id='htmlCode1' class='html'><i class="fa fa-cog fa-3x fa-spin"></i> Loading...</code></pre>
                                     </div>
                                 </div>
                                 <div class="collapse" id="css">
                                     <div class="well">
                                         <h5>CSS:</h5>
-                                        <?php 
-                                            $classblocks = array();
-                                            $idblocks = array();
-                                            $tagblocks = array();
-                                            $css = '';  // Used later to show assets only applicable to this CSS
-                                            $tags = $repo->findselectors($repo->contents($path));
-                                            echo "<pre><code class='css'>";
-                                                if(!empty($tags['classes'])){
-                                                    foreach($repo->filtercss('class', $tags['classes']) as $section){
-                                                        $classblocks[] = $section."\n";
-                                                        $css .= $section;
-                                                    }
-                                                }
-                                                if(!empty($tags['ids'])){
-                                                    foreach($repo->filtercss('id', $tags['ids']) as $section){
-                                                        $idblocks[] = $section."\n";
-                                                        $css .= $section;
-                                                    }
-                                                }
-                                                if(!empty($tags['tags'])){
-                                                    foreach($repo->filtercss('tag', $tags['tags']) as $section){
-                                                        $tagblocks[] = $section."\n";
-                                                        $css .= $section;
-                                                    }
-                                                }
-                                                $classblocks = array_unique($classblocks);
-                                                $idblocks = array_unique($idblocks);
-                                                $tagblocks = array_unique($tagblocks);
-                                                foreach($classblocks as $block){
-                                                    echo $block;
-                                                }
-                                                foreach($idblocks as $block){
-                                                    echo $block;
-                                                }
-                                                foreach($tagblocks as $block){
-                                                    echo $block;
-                                                }
-                                            echo "</code></pre>";
-                                        ?>
+                                        <pre><code id='cssCode1' class='css'><i class="fa fa-cog fa-3x fa-spin"></i> Loading...</code></pre>
                                     </div>
                                 </div>
                                 <div class="collapse" id="assets">
                                     <div class="well">
                                         <h5>Assets:</h5>
-                                        <?php
-                                            // Output the root css and js files:
-                                            $oldlocation = $repo->pwd();
-                                            $repo->cd('/');
-                                            foreach($repo->ls() as $file){
-                                                if(!$repo->isDir($file)){
-                                                    if(substr($file, -3) == '.js' || substr($file, -4) == '.css'){
-                                                        ?><a href="<?= $repo->link($file) ?>" download="<?= $file ?>"><?= $file ?></a><br /><?php
-                                                    }
-                                                }
-                                            }
-                                            $repo->cd($oldlocation);
-
-                                            // Output the file itself:
-                                            ?><a href="<?= $repo->link($path) ?>" download="<?= $path ?>"><?= $path ?></a><br /><?php
-
-                                            // Output any assets:
-                                            $oldlocation = $repo->pwd();
-                                            $repo->cd('/');
-                                            $assets = $repo->findassets($html.'|'.$css);
-                                            foreach($assets as $asset){
-                                                $output = explode('/', $asset);
-                                                $output = end(array_values($output));
-                                                ?><a href="<?= $repo->link($asset) ?>" download="<?= $asset ?>"><?= $output ?></a><br /><?php
-                                            }
-                                            $repo->cd($oldlocation);
-                                        ?>
+                                        <p id="assetsCode1"><i class="fa fa-cog fa-3x fa-spin"></i> Loading...</p>
                                     </div>
                                 </div>
                                 <div class="import"><?php echo $repo->fixedcontents($path); ?></div>
@@ -545,7 +423,6 @@
         <script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script><!-- No idea if licensing allows this. -->
         <script>
-            hljs.initHighlightingOnLoad();
             var search_expanded = false;
             $('#atomic-styleguide-search-button').click(function(){
                 $('#atomic-styleguide-search-form').animate({ width: (search_expanded)?'0':'225px', height: (search_expanded)?'0':'51px' }, 500, function(){
@@ -554,11 +431,64 @@
                 $('#atomic-styleguide-search-button').css('background-color', (search_expanded)?'inherit':'#CCCCCC');
             });
         </script>
+        <script>
+            var htmlNum = 1;
+            for(var i=1; i <= paths.length; ++i){
+                $.ajax({ url: 'functions.php',
+                    data: {
+                        action: 'relevantHTML',
+                        path: paths[i-1]
+                    },
+                    type: 'post',
+                    success: function(output){
+                        var dom = $('#htmlCode'+htmlNum);
+                        ++htmlNum;
+                        dom.html(output);
+                        dom.each(function(i, block) {
+                            hljs.highlightBlock(block);
+                        });
+                    }
+                });
+            }
+            var cssNum = 1;
+            for(var i=1; i <= paths.length; ++i){
+                $.ajax({ url: 'functions.php',
+                    data: {
+                        action: 'relevantCSS',
+                        path: paths[i-1]
+                    },
+                    type: 'post',
+                    success: function(output){
+                        var dom = $('#cssCode'+cssNum);
+                        ++cssNum;
+                        dom.html(output);
+                        dom.each(function(i, block) {
+                            hljs.highlightBlock(block);
+                        });
+                    }
+                });
+            }
+            var assetsNum = 1;
+            for(var i=1; i <= paths.length; ++i){
+                $.ajax({ url: 'functions.php',
+                    data: {
+                        action: 'relevantAssets',
+                        path: paths[i-1]
+                    },
+                    type: 'post',
+                    success: function(output){
+                        var dom = $('#assetsCode'+assetsNum);
+                        ++assetsNum;
+                        dom.html(output);
+                    }
+                });
+            }
+        </script>
         <?php
 
             // Autoload the atomicstyleguide-autoload.html file:
             ?>
-                <div style="height:0; width:0; overflow:hidden; display:none;">
+                <div style="position:absolute; padding:0; margin:0; border:none; height:0; width:0; overflow:hidden; display:none;">
                     <?php
                         $oldlocation = $repo->pwd();
                         $repo->cd('/');

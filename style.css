@@ -99,5 +99,8 @@ body > #content > .singleElement > .element > .collapsing pre{
     padding-left:5px;
     padding-right:5px;
     color:black;
-    border:1px solid #ffafaf;
+    border:1px dotted #996699;
+}
+.atomicstyleguide-logo{
+    color: #996699;
 }

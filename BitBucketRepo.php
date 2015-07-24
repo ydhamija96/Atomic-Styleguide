@@ -144,7 +144,7 @@ class BitBucketRepo{
         $this->cd('/');
         foreach($this->ls() as $file){
             if(!$this->isDir($file)){
-                if(substr($file, -3) == '.js' || substr($file, -4) == '.css'){
+                if(substr($file, -4) == '.css'){
                     $this->file_force_contents($rootname.'/'.$foldername.'/'.$file, $this->contents($file));
                 }
             }
@@ -155,31 +155,10 @@ class BitBucketRepo{
         $oldlocation = $this->pwd();
         $this->cd($item);
         $html = $this->contents($item);
-        //Get CSS for just that file:
-        $css = '';
-        $tags = $this->findselectors($html);
-        //Get CSS classes:
-        foreach($tags['classes'] as $class){
-            foreach($this->filtercss('class', $class) as $section){
-                $css .= $section;
-            }
-        }
-        //Get CSS ids:
-        foreach($tags['ids'] as $id){
-            foreach($this->filtercss('id', $id) as $section){
-                $css .= $section;
-            }
-        }
-        //Get CSS tags:
-        foreach($tags['tags'] as $tag){
-            foreach($this->filtercss('tag', $tag) as $section){
-                $css .= $section;
-            }
-        }
-        //Finally, copy the assets:
+        $css = $this->relevantCSS($item);
         $old = $this->pwd();
         $this->cd('/');
-        $assets = $this->findassets($html.'|'.$css);
+        $assets = $this->findassets($this->contents('/atomicstyleguide-autoload.html').'|'.$html.'|'.$css);
         foreach($assets as $asset){
             $this->file_force_contents($rootname.'/'.$foldername.'/'.$asset, $this->contents($asset));
         }
@@ -410,7 +389,7 @@ class BitBucketRepo{
         }
         return $mediaBlocks;
     }
-    public function filtercss($type, $names){
+    private function filtercss($type, $names){
         $text = preg_replace('/\/\*.*?\*\//','', $this->getcss());
         $mediablocks = $this->parse_css_media_queries($text);
         $namesregex = '(?:';
@@ -451,7 +430,46 @@ class BitBucketRepo{
         }
         return $results[1];
     }
-    public function findassets($text){
+    public function relevantCSS($path){
+        $result = '';
+        $classblocks = array();
+        $idblocks = array();
+        $tagblocks = array();
+        $css = '';  // Used later to show assets only applicable to this CSS
+        $tags = $this->findselectors($this->contents($path));
+        if(!empty($tags['classes'])){
+            foreach($this->filtercss('class', $tags['classes']) as $section){
+                $classblocks[] = $section."\n";
+                $css .= $section;
+            }
+        }
+        if(!empty($tags['ids'])){
+            foreach($this->filtercss('id', $tags['ids']) as $section){
+                $idblocks[] = $section."\n";
+                $css .= $section;
+            }
+        }
+        if(!empty($tags['tags'])){
+            foreach($this->filtercss('tag', $tags['tags']) as $section){
+                $tagblocks[] = $section."\n";
+                $css .= $section;
+            }
+        }
+        $classblocks = array_unique($classblocks);
+        $idblocks = array_unique($idblocks);
+        $tagblocks = array_unique($tagblocks);
+        foreach($classblocks as $block){
+            $result .= $block;
+        }
+        foreach($idblocks as $block){
+            $result .= $block;
+        }
+        foreach($tagblocks as $block){
+            $result .= $block;
+        }
+        return $result;
+    }
+    private function findassets($text){
         $old = $this->pwd();
         $this->cd('/');
         $assets = array();
@@ -478,6 +496,39 @@ class BitBucketRepo{
 
         $this->cd($old);
         return $assets;
+    }
+    public function relevantDownloads($item){
+        $result = '';
+
+        // Output the root css and js files:
+        $oldlocation = $this->pwd();
+        $this->cd('/');
+        foreach($this->ls() as $file){
+            if(!$this->isDir($file)){
+                if(substr($file, -4) == '.css'){
+                    $result .= '<a href="'.$this->link($file).'" download="'.$file.'">'.$file.'</a><br />';
+                }
+            }
+        }
+        $this->cd($oldlocation);
+
+        // Output the file itself:
+        $result .= '<a href="'.$this->link($item).'" download="'.$item.'">'.$item.'</a><br />';
+
+        // Output any assets:
+        $html = $this->contents($item);
+        $css = $this->relevantCSS($item);
+        $oldlocation = $this->pwd();
+        $this->cd('/');
+        $assets = $this->findassets($this->contents('/atomicstyleguide-autoload.html').'|'.$html.'|'.$css);
+        foreach($assets as $asset){
+            $output = explode('/', $asset);
+            $output = end(array_values($output));
+            $result .= '<a href="'.$this->link($asset).'" download="'.$asset.'">'.$output.'</a><br />';
+        }
+        $this->cd($oldlocation);
+
+        return $result;
     }
 }
 ?>
