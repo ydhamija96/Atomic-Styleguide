@@ -4,13 +4,13 @@
 	if(isset($_SESSION['repo'])){
 		$repo = $_SESSION['repo'];
 		if(isset($_POST['action']) && isset($_POST['path']) && isset($_POST['input']) && $_POST['action'] == 'relevantCSS'){
-			echo '{"Input:" "' .$_POST['input']. '", "Output:" "'.htmlspecialchars($repo->relevantCSS($_POST['path'])) . '"}';
+			echo json_encode(array('Input' => $_POST['input'], 'Output' => htmlspecialchars($repo->relevantCSS($_POST['path']))));
 		}
 		if(isset($_POST['action']) && isset($_POST['path']) && $_POST['action'] == 'relevantHTML'){
-			echo '{"Input:" "' .$_POST['input']. '", "Output:" "'.htmlspecialchars($repo->contents($_POST['path'])) . '"}';
+			echo json_encode(array('Input' => $_POST['input'], 'Output' => htmlspecialchars($repo->contents($_POST['path']))));
 		}
 		if(isset($_POST['action']) && isset($_POST['path']) && $_POST['action'] == 'relevantAssets'){
-			echo '{"Input:" "' .$_POST['input']. '", "Output:" "'.$repo->relevantDownloads($_POST['path']) . '"}';
+			echo json_encode(array('Input' => $_POST['input'], 'Output' => $repo->relevantDownloads($_POST['path'])));
 		}
 	}
 ?>
