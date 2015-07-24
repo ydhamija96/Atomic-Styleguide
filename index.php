@@ -342,7 +342,7 @@
                                                         <ul>
                                                             <li>If it exists, it will be autoloaded by the styleguide.</li>
                                                             <li>Javascript can be included there inline.</li>
-                                                            <li>You can also keep separate Javascript files and load them there (via <span>&lt;script src=...&gt;</span>). This is the preferred way.</li>
+                                                            <li>You can also keep separate Javascript files and load them there (via <span>&lt;script src=[file].js&gt;</span>). This is the preferred way.</li>
                                                             <li>Note that this file is <strong>only</strong> loaded in fullscreen mode.</li>
                                                         </ul>
                                                     </li>
