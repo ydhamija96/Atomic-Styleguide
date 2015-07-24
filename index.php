@@ -51,6 +51,9 @@
     ?>
     <script>
         var paths = [];
+        $('a').on("click",function(){
+            window.stop();
+        });
     </script>
 </head>
 <?php if(isset($_GET['fullscreen']) && isset($_GET['path']) && $_GET['fullscreen'] == 'true') : ?>
@@ -429,9 +432,6 @@
                     search_expanded = !search_expanded;
                 });
                 $('#atomic-styleguide-search-button').css('background-color', (search_expanded)?'inherit':'#CCCCCC');
-            });
-            $('a').on("click",function(){
-                window.stop();
             });
         </script>
         <script>
