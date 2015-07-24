@@ -430,10 +430,8 @@
                 });
                 $('#atomic-styleguide-search-button').css('background-color', (search_expanded)?'inherit':'#CCCCCC');
             });
-            $(function() {
-                $('a').on("click",function(){
-                    window.stop();
-                });
+            $('a').on("click",function(){
+                window.stop();
             });
         </script>
         <script>
