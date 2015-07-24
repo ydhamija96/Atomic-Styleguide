@@ -388,7 +388,7 @@
                             </div>
                             <div class="element">
                                 <script>
-                                    paths.push("<?= $item ?>");
+                                    paths.push("<?= $path ?>");
                                 </script>
                                 <div class="collapse" id="html">
                                     <div class="well">
