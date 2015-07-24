@@ -424,11 +424,16 @@
         <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script><!-- No idea if licensing allows this. -->
         <script>
             var search_expanded = false;
-            $('#atomic-styleguide-search-button').click(function(){
+            $('#atomic-styleguide-search-button').on("click",function(){
                 $('#atomic-styleguide-search-form').animate({ width: (search_expanded)?'0':'225px', height: (search_expanded)?'0':'51px' }, 500, function(){
                     search_expanded = !search_expanded;
                 });
                 $('#atomic-styleguide-search-button').css('background-color', (search_expanded)?'inherit':'#CCCCCC');
+            });
+            $(function() {
+                $('a').on("click",function(){
+                    window.stop();
+                });
             });
         </script>
         <script>
