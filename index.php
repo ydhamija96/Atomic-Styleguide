@@ -251,7 +251,6 @@
                                             <script>
                                                 paths.push("<?= $item ?>");
                                             </script>
-                                            <div class="import"><?php echo $repo->fixedcontents($item); ?></div>
                                             <div class="collapse" id="html<?= $counter ?>">
                                                 <div class="well">
                                                     <h5>HTML:</h5>
@@ -270,6 +269,7 @@
                                                     <p id="assetsCode<?= $counter ?>"><i class="fa fa-cog fa-3x fa-spin"></i> Loading...</p>
                                                 </div>
                                             </div>
+                                            <div class="import"><?php echo $repo->fixedcontents($item); ?></div>
                                         </div>
                                         <?php
                                     echo '</div>';
