@@ -19,7 +19,7 @@
             $repo = $_SESSION['repo'];
         }
         else{
-            $repo = new BitBucketRepo('https://bitbucket.org/api/1.0/repositories/bluefountainmedia/nyu/raw/development/');
+            $repo = new BitBucketRepo('https://bitbucket.org/api/1.0/repositories/bluefountainmedia/nyu/raw/development/', '/');
             $_SESSION['repo'] = $repo;
         }
 
@@ -315,16 +315,15 @@
                                                 <strong>CSS:</strong>
                                                 <ul>
                                                     <li>
-                                                        CSS files are loaded in top-down order starting from the deepest subdirectory to the root.
+                                                        CSS files are only loaded from the root.
                                                         <ul>
-                                                            <li>Example: <span>/components/component-subgroup/stylesheet1.css</span> appears <strong>before</strong> <span>/components/stylesheet2.css</span></li> 
-                                                            (and would be overridden).
+                                                            <li>However, you can use <span>@import</span> statements to load other CSS files which may be in subdirectories.</li>
                                                         </ul>
                                                     </li>
                                                     <li>
                                                         If you'd like to have your CSS load in a specific order, you have two options:
                                                         <ul>
-                                                            <li>Put it all in one file. This is the preferred way.</li>
+                                                            <li>Put it all in one file in the root.</li>
                                                             <li>Put a single CSS file in the root that imports other CSS files from subdirectories in the 
                                                             preferred order (via <span>@import</span>).</li>
                                                         </ul>
@@ -443,12 +442,12 @@
             });
         </script>
         <script>
-            for(var i=1; i <= paths.length; ++i){
+            function buildHTML(count){
                 $.ajax({ url: 'functions.php',
                     data: {
                         action: 'relevantHTML',
-                        input: i,
-                        path: paths[i-1]
+                        input: count+1,
+                        path: paths[count]
                     },
                     type: 'post',
                     success: function(output){
@@ -458,15 +457,18 @@
                         dom.each(function(i, block) {
                             hljs.highlightBlock(block);
                         });
+                        if(count < paths.length){
+                            buildHTML(count+1);
+                        }
                     }
                 });
             }
-            for(var i=1; i <= paths.length; ++i){
+            function buildCSS(count){
                 $.ajax({ url: 'functions.php',
                     data: {
                         action: 'relevantCSS',
-                        input: i,
-                        path: paths[i-1]
+                        input: count+1,
+                        path: paths[count]
                     },
                     type: 'post',
                     success: function(output){
@@ -476,24 +478,35 @@
                         dom.each(function(i, block) {
                             hljs.highlightBlock(block);
                         });
+                        if(count < paths.length){
+                            buildCSS(count+1);
+                        }
                     }
                 });
             }
-            for(var i=1; i <= paths.length; ++i){
+            function buildAssets(count){
                 $.ajax({ url: 'functions.php',
                     data: {
                         action: 'relevantAssets',
-                        input: i,
-                        path: paths[i-1]
+                        input: count+1,
+                        path: paths[count]
                     },
                     type: 'post',
                     success: function(output){
                         var returned = jQuery.parseJSON(output);
                         var dom = $('#assetsCode'+returned.Input);
                         dom.html(returned.Output);
+                        if(count < paths.length){
+                            buildAssets(count+1);
+                        }
                     }
                 });
             }
+            $(function() {
+                buildHTML(0);
+                buildCSS(0);
+                buildAssets(0);
+            });
         </script>
         <?php
 

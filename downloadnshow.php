@@ -28,8 +28,11 @@
 
     // Download the file
 	if(!file_exists($file)){
-		if($extension == '.css' || $extension == '.html' || $extension == '.js'){
+		if($extension == '.html' || $extension == '.js'){
 			file_put_contents($file, $repo->fixRelatives(file_get_contents($url)));
+		}
+		elseif($extension == '.css'){
+			file_put_contents($file, $repo->fixCSS(file_get_contents($url)));
 		}
 		else{
     		file_put_contents($file, file_get_contents($url));

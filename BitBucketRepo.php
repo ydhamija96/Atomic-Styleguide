@@ -2,15 +2,21 @@
 class BitBucketRepo{
     private $directoryListing = array();
     private $parentURL;
+    private $ourUrl;
     private $currentLoc = array();
     private $mainCSS = 0;
     private $fixedCSS = 0;
+    private $allMainCSS = 0;
+    private $allFixedCSS = 0;
     private $nonce;
-    function __construct($url){
+    function __construct($url, $our){
         $this->parentURL = $url;
+        $this->ourUrl = $our;
         $this->directoryListing = $this->getAllContents($this->parentURL, $this->directoryListing);
         $this->mainCSS = 0;
         $this->fixedCSS = 0;
+        $this->allMainCSS = 0;
+        $this->allFixedCSS = 0;
         $this->nonce = hash('sha512', rand());
         $_SESSION['nonce'] = $this->nonce;
     }
@@ -280,7 +286,7 @@ class BitBucketRepo{
 
         // Replace matches with a special download+show link
         foreach($matches as $match){
-            $text = str_replace($match, 'downloadnshow.php?url='.strrev($this->link($match)).'&nonce='.$this->nonce, $text);   // Reversing string so that similar matches don't trigger multiple replacements
+            $text = str_replace($match, $this->ourUrl.'/downloadnshow.php?url='.strrev($this->link($match)).'&nonce='.$this->nonce, $text);   // Reversing string so that similar matches don't trigger multiple replacements
         }
         
         return $text;
@@ -327,7 +333,7 @@ class BitBucketRepo{
         $tags = array_unique($tags);
         return array('classes' => $classes, 'ids' => $ids, 'tags' => $tags);
     }
-    private function fixCSS($text){
+    public function fixCSS($text){
         $old = $this->pwd();
         $this->cd('/');
         $text = preg_replace('/\/\*.*?\*\//','', $text);
@@ -336,33 +342,62 @@ class BitBucketRepo{
         $text = preg_replace('/([},][^@\w\.#]*?)(?!\.import)([\w\.#])/is', '${1} .import ${2}', $text);
         $text = preg_replace('/(@[^{]*?{[^@\w\.#]*?)(?!\.import)([\w\.#])/is', '${1} .import ${2}', $text);
         $this->cd($old);
-        return $text;
+        return substr($text, 4);
     }
-    public function getcss($fix = false){
-        if($fix){
-            if($this->fixedCSS == 0){
-                $text = '';
-                $text .= $this->fixCSS($this->getcss(false));
-                $this->fixedCSS = $text;
+    public function getcss($fix = false, $all = false){
+        if($all){
+            if($fix){
+                if($this->allFixedCSS == 0){
+                    $text = '';
+                    $text .= $this->fixCSS($this->getcss(false, $all));
+                    $this->allFixedCSS = $text;
+                }
+                return $this->allFixedCSS;
             }
-            return $this->fixedCSS;
-        }
-        else{
-            if($this->mainCSS == 0){
-                $text = '';
-                $old = $this->pwd();
-                $this->cd('/');
-                foreach($this->ls(true, true) as $file){
-                    if(!$this->isDir($file)){
-                        if(substr($file, -4) == '.css'){
-                            $text .= $this->contents($file);
+            else{
+                if($this->allMainCSS == 0){
+                    $text = '';
+                    $old = $this->pwd();
+                    $this->cd('/');
+                    foreach($this->ls() as $file){
+                        if(!$this->isDir($file)){
+                            if(substr($file, -4) == '.css'){
+                                $text .= $this->contents($file);
+                            }
                         }
                     }
+                    $this->cd($old);
+                    $this->allMainCSS = $text;
                 }
-                $this->cd($old);
-                $this->mainCSS = $text;
+                return $this->allMainCSS;
             }
-            return $this->mainCSS;
+        }
+        else{
+            if($fix){
+                if($this->fixedCSS == 0){
+                    $text = '';
+                    $text .= $this->fixCSS($this->getcss(false));
+                    $this->fixedCSS = $text;
+                }
+                return $this->fixedCSS;
+            }
+            else{
+                if($this->mainCSS == 0){
+                    $text = '';
+                    $old = $this->pwd();
+                    $this->cd('/');
+                    foreach($this->ls() as $file){
+                        if(!$this->isDir($file)){
+                            if(substr($file, -4) == '.css'){
+                                $text .= $this->contents($file);
+                            }
+                        }
+                    }
+                    $this->cd($old);
+                    $this->mainCSS = $text;
+                }
+                return $this->mainCSS;
+            }
         }
     }
     private function parse_css_media_queries($css){
@@ -390,7 +425,7 @@ class BitBucketRepo{
         return $mediaBlocks;
     }
     private function filtercss($type, $names){
-        $text = preg_replace('/\/\*.*?\*\//','', $this->getcss());
+        $text = preg_replace('/\/\*.*?\*\//','', $this->getcss(false, true));
         $mediablocks = $this->parse_css_media_queries($text);
         $namesregex = '(?:';
         if(!empty($names)){
@@ -435,24 +470,20 @@ class BitBucketRepo{
         $classblocks = array();
         $idblocks = array();
         $tagblocks = array();
-        $css = '';  // Used later to show assets only applicable to this CSS
         $tags = $this->findselectors($this->contents($path));
         if(!empty($tags['classes'])){
             foreach($this->filtercss('class', $tags['classes']) as $section){
                 $classblocks[] = $section."\n";
-                $css .= $section;
             }
         }
         if(!empty($tags['ids'])){
             foreach($this->filtercss('id', $tags['ids']) as $section){
                 $idblocks[] = $section."\n";
-                $css .= $section;
             }
         }
         if(!empty($tags['tags'])){
             foreach($this->filtercss('tag', $tags['tags']) as $section){
                 $tagblocks[] = $section."\n";
-                $css .= $section;
             }
         }
         $classblocks = array_unique($classblocks);
