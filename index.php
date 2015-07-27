@@ -51,6 +51,14 @@
     ?>
     <script>
         var paths = [];
+        var loadingText = [
+            "Please wait, 640K ought to be enough for anybody.",
+            "Please wait, the bits are breeding.",
+            "Please wait. At least you're not on hold.",
+            "Please wait while the satellite moves into position.",
+            "Please wait. The last time I tried this the monkey didn't survive. Let's hope it works better this time.",
+            "Loading humorous message. Please wait."
+        ];
     </script>
 </head>
 <?php if(isset($_GET['fullscreen']) && isset($_GET['path']) && $_GET['fullscreen'] == 'true') : ?>
@@ -262,19 +270,19 @@
                                             <div class="collapse" id="html<?= $counter ?>">
                                                 <div class="well">
                                                     <h5>HTML:</h5>
-                                                    <pre><code id="htmlCode<?= $counter ?>" class='html'><i class="fa fa-cog fa-3x fa-spin"></i> Loading...</code></pre>
+                                                    <pre><code id="htmlCode<?= $counter ?>" class='html'><i class="fa fa-cog fa-3x fa-spin"></i> <script>document.write(loadingText[Math.floor(Math.random()*loadingText.length)]);</script></code></pre>
                                                 </div>
                                             </div>
                                             <div class="collapse" id="css<?= $counter ?>">
                                                 <div class="well">
                                                     <h5>CSS:</h5>
-                                                    <pre><code id='cssCode<?= $counter ?>' class='css'><i class="fa fa-cog fa-3x fa-spin"></i> Loading...</code></pre>
+                                                    <pre><code id='cssCode<?= $counter ?>' class='css'><i class="fa fa-cog fa-3x fa-spin"></i> <script>document.write(loadingText[Math.floor(Math.random()*loadingText.length)]);</script></code></pre>
                                                 </div>
                                             </div>
                                             <div class="collapse" id="assets<?= $counter ?>">
                                                 <div class="well">
                                                     <h5>Assets:</h5>
-                                                    <p id="assetsCode<?= $counter ?>"><i class="fa fa-cog fa-3x fa-spin"></i> Loading...</p>
+                                                    <p id="assetsCode<?= $counter ?>"><i class="fa fa-cog fa-3x fa-spin"></i> <script>document.write(loadingText[Math.floor(Math.random()*loadingText.length)]);</script></p>
                                                 </div>
                                             </div>
                                             <div class="import"><?php echo $repo->fixedcontents($item); ?></div>
@@ -400,19 +408,19 @@
                                 <div class="collapse" id="html">
                                     <div class="well">
                                         <h5>HTML:</h5>
-                                        <pre><code id='htmlCode1' class='html'><i class="fa fa-cog fa-3x fa-spin"></i> Loading...</code></pre>
+                                        <pre><code id='htmlCode1' class='html'><i class="fa fa-cog fa-3x fa-spin"></i> <script>document.write(loadingText[Math.floor(Math.random()*loadingText.length)]);</script></code></pre>
                                     </div>
                                 </div>
                                 <div class="collapse" id="css">
                                     <div class="well">
                                         <h5>CSS:</h5>
-                                        <pre><code id='cssCode1' class='css'><i class="fa fa-cog fa-3x fa-spin"></i> Loading...</code></pre>
+                                        <pre><code id='cssCode1' class='css'><i class="fa fa-cog fa-3x fa-spin"></i> <script>document.write(loadingText[Math.floor(Math.random()*loadingText.length)]);</script></code></pre>
                                     </div>
                                 </div>
                                 <div class="collapse" id="assets">
                                     <div class="well">
                                         <h5>Assets:</h5>
-                                        <p id="assetsCode1"><i class="fa fa-cog fa-3x fa-spin"></i> Loading...</p>
+                                        <p id="assetsCode1"><i class="fa fa-cog fa-3x fa-spin"></i> <script>document.write(loadingText[Math.floor(Math.random()*loadingText.length)]);</script></p>
                                     </div>
                                 </div>
                                 <div class="import"><?php echo $repo->fixedcontents($path); ?></div>
