@@ -257,7 +257,7 @@
                                         </div>
                                         <div class="element">
                                             <script>
-                                                paths.push("<?= $item ?>");
+                                                paths.push("<?= $repo->pwd().'/'.$item ?>");
                                             </script>
                                             <div class="collapse" id="html<?= $counter ?>">
                                                 <div class="well">
@@ -450,73 +450,54 @@
             });
         </script>
         <script>
-            function buildHTML(count){
-                $.ajax({ url: 'functions.php',
-                    data: {
-                        action: 'relevantHTML',
-                        input: count+1,
-                        path: paths[count]
-                    },
-                    type: 'post',
-                    success: function(output){
-                        var returned = jQuery.parseJSON(output);
-                        var dom = $('#htmlCode'+returned.Input);
-                        dom.html(returned.Output);
-                        dom.each(function(i, block) {
-                            hljs.highlightBlock(block);
-                        });
-                        var newCount = count + 1;
-                        if(newCount < paths.length){
-                            buildHTML(newCount);
-                        }
-                    }
-                });
-            }
-            function buildCSS(count){
-                $.ajax({ url: 'functions.php',
-                    data: {
-                        action: 'relevantCSS',
-                        input: count+1,
-                        path: paths[count]
-                    },
-                    type: 'post',
-                    success: function(output){
-                        var returned = jQuery.parseJSON(output);
-                        var dom = $('#cssCode'+returned.Input);
-                        dom.html(returned.Output);
-                        dom.each(function(i, block) {
-                            hljs.highlightBlock(block);
-                        });
-                        var newCount = count + 1;
-                        if(newCount < paths.length){
-                            buildCSS(newCount);
-                        }
-                    }
-                });
-            }
-            function buildAssets(count){
-                $.ajax({ url: 'functions.php',
-                    data: {
-                        action: 'relevantAssets',
-                        input: count+1,
-                        path: paths[count]
-                    },
-                    type: 'post',
-                    success: function(output){
-                        var returned = jQuery.parseJSON(output);
-                        var dom = $('#assetsCode'+returned.Input);
-                        dom.html(returned.Output);
-                        var newCount = count + 1;
-                        if(newCount < paths.length){
-                            buildAssets(newCount);
-                        }
-                    }
-                });
-            }
             $(function() {
-                buildHTML(0);
-                buildCSS(0);
-                buildAssets(0);
+                for(var i=1; i<=paths.length; ++i){
+                    $.ajax({ url: 'functions.php',
+                        data: {
+                            action: 'relevantHTML',
+                            input: i,
+                            path: paths[i-1]
+                        },
+                        type: 'post',
+                        success: function(output){
+                            var returned = jQuery.parseJSON(output);
+                            var dom = $('#htmlCode'+returned.Input);
+                            dom.html(returned.Output);
+                            dom.each(function(i, block) {
+                                hljs.highlightBlock(block);
+                            });
+                        }
+                    });
+                    $.ajax({ url: 'functions.php',
+                        data: {
+                            action: 'relevantCSS',
+                            input: i,
+                            path: paths[i-1]
+                        },
+                        type: 'post',
+                        success: function(output){
+                            var returned = jQuery.parseJSON(output);
+                            var dom = $('#cssCode'+returned.Input);
+                            dom.html(returned.Output);
+                            dom.each(function(i, block) {
+                                hljs.highlightBlock(block);
+                            });
+                        }
+                    });
+                    $.ajax({ url: 'functions.php',
+                        data: {
+                            action: 'relevantAssets',
+                            input: i,
+                            path: paths[i-1]
+                        },
+                        type: 'post',
+                        success: function(output){
+                            var returned = jQuery.parseJSON(output);
+                            var dom = $('#assetsCode'+returned.Input);
+                            dom.html(returned.Output);
+                        }
+                    });
+                }
             });
         </script>
         <?php
