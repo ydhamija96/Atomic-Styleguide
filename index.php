@@ -96,9 +96,17 @@
                                                 $repo->cd($dir);
                                                 if((strpos($repo->pwd(), '/components') === 0)){    //If we're in the components root dir.
                                                     foreach($repo->ls(false) as $item):       //Shows only directories
-                                                    //foreach($repo->ls() as $item):              //Shows everything
-                                                        $output = str_replace('.html', '', ucwords(str_replace('_', ' ', trim($item, '/'))));
-                                                        ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= $output ?></a></li><?php
+                                                        // Only show folders that have at least one .html file in them
+                                                        $old = $repo->pwd();
+                                                        $repo->cd($item);
+                                                        foreach($repo->ls() as $file){
+                                                            if(end(explode('.', $file)) == 'html'){
+                                                                $output = str_replace('.html', '', ucwords(str_replace('_', ' ', trim($item, '/'))));
+                                                                ?><li><a href="?path=<?= urlencode($old.'/'.$item) ?>"><?= $output ?></a></li><?php   
+                                                                break;                                                             
+                                                            }
+                                                        }
+                                                        $repo->cd($old);
                                                     endforeach;
                                                 }
                                                 elseif((strpos($repo->pwd(), '/templates') === 0)){ //If we're in the templates root dir.
@@ -219,9 +227,9 @@
                         if(strpos($repo->pwd(), '/components') === 0){  // If in components root dir
                             $counter = 0;
 
-                            // Display all items that are not directories:
+                            // Display all .html files:
                             foreach($repo->ls() as $item){
-                                if(!$repo->isDir($item)){
+                                if(!$repo->isDir($item) && end(explode('.', $item)) == 'html'){
                                     ++$counter;
                                     echo '<div class="singleElement">'; ?>
                                         <div class="options">
