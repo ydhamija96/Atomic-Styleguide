@@ -345,7 +345,7 @@
                                                 <strong>JavaScript:</strong>
                                                 <ul>
                                                     <li>
-                                                        Javascript can be loaded through this file: <span>/atomicstyleguide-autoload.html</span>
+                                                        Javascript can be loaded through this file: <span>/atomicstyleguide-autoload.html</span>.
                                                         <ul>
                                                             <li>If it exists, it will be autoloaded by the styleguide.</li>
                                                             <li>Javascript can be included there inline.</li>
