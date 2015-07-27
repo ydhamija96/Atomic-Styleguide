@@ -450,8 +450,10 @@
             });
         </script>
         <script>
+            var available = [];
             $(function() {
                 for(var i=1; i<=paths.length; ++i){
+                    available.push('');
                     $.ajax({ url: 'functions.php',
                         data: {
                             action: 'relevantHTML',
@@ -466,6 +468,26 @@
                             dom.each(function(i, block) {
                                 hljs.highlightBlock(block);
                             });
+                            if(available[returned.Input] != ''){
+                                $.ajax({ url: 'functions.php',
+                                    data: {
+                                        action: 'relevantAssets',
+                                        input: returned.Input,
+                                        css: available[returned.Input],
+                                        html: returned.Output,
+                                        path: paths[returned.Input-1]
+                                    },
+                                    type: 'post',
+                                    success: function(output){
+                                        var returned = jQuery.parseJSON(output);
+                                        var dom = $('#assetsCode'+returned.Input);
+                                        dom.html(returned.Output);
+                                    }
+                                });
+                            }
+                            else{
+                                available[returned.Input] = returned.Output;
+                            }
                         }
                     });
                     $.ajax({ url: 'functions.php',
@@ -482,20 +504,26 @@
                             dom.each(function(i, block) {
                                 hljs.highlightBlock(block);
                             });
-                            $.ajax({ url: 'functions.php',
-                                data: {
-                                    action: 'relevantAssets',
-                                    input: returned.Input,
-                                    css: returned.Output,
-                                    path: paths[returned.Input-1]
-                                },
-                                type: 'post',
-                                success: function(output){
-                                    var returned = jQuery.parseJSON(output);
-                                    var dom = $('#assetsCode'+returned.Input);
-                                    dom.html(returned.Output);
-                                }
-                            });
+                            if(available[returned.Input] != ''){
+                                $.ajax({ url: 'functions.php',
+                                    data: {
+                                        action: 'relevantAssets',
+                                        input: returned.Input,
+                                        html: available[returned.Input],
+                                        css: returned.Output,
+                                        path: paths[returned.Input-1]
+                                    },
+                                    type: 'post',
+                                    success: function(output){
+                                        var returned = jQuery.parseJSON(output);
+                                        var dom = $('#assetsCode'+returned.Input);
+                                        dom.html(returned.Output);
+                                    }
+                                });
+                            }
+                            else{
+                                available[returned.Input] = returned.Output;
+                            }
                         }
                     });
                 }
