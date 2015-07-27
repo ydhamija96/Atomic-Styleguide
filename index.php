@@ -457,8 +457,9 @@
                         dom.each(function(i, block) {
                             hljs.highlightBlock(block);
                         });
-                        if(count < paths.length){
-                            buildHTML(count+1);
+                        var newCount = count + 1;
+                        if(newCount < paths.length){
+                            buildHTML(newCount+1);
                         }
                     }
                 });
@@ -478,8 +479,9 @@
                         dom.each(function(i, block) {
                             hljs.highlightBlock(block);
                         });
-                        if(count < paths.length){
-                            buildCSS(count+1);
+                        var newCount = count + 1;
+                        if(newCount < paths.length){
+                            buildCSS(newCount+1);
                         }
                     }
                 });
@@ -496,8 +498,9 @@
                         var returned = jQuery.parseJSON(output);
                         var dom = $('#assetsCode'+returned.Input);
                         dom.html(returned.Output);
-                        if(count < paths.length){
-                            buildAssets(count+1);
+                        var newCount = count + 1;
+                        if(newCount < paths.length){
+                            buildAssets(newCount+1);
                         }
                     }
                 });

@@ -359,7 +359,7 @@ class BitBucketRepo{
                     $text = '';
                     $old = $this->pwd();
                     $this->cd('/');
-                    foreach($this->ls() as $file){
+                    foreach($this->ls(true, true) as $file){
                         if(!$this->isDir($file)){
                             if(substr($file, -4) == '.css'){
                                 $text .= $this->contents($file);
