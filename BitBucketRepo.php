@@ -286,7 +286,7 @@ class BitBucketRepo{
 
         // Replace matches with a special download+show link
         foreach($matches as $match){
-            $text = str_replace($match, $this->ourUrl.'/downloadnshow.php?url='.strrev($this->link($match)).'&nonce='.$this->nonce, $text);   // Reversing string so that similar matches don't trigger multiple replacements
+            $text = str_replace($match, $this->ourUrl.'/downloadnshow.php?url='.strrev($this->link($match)), $text);   // Reversing string so that similar matches don't trigger multiple replacements
         }
         
         return $text;

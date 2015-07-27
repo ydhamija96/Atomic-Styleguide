@@ -2,13 +2,13 @@
 	require_once('BitBucketRepo.php');
 	session_start();
 	
-	if(!isset($_GET['url']) || !isset($_GET['nonce'])){
+	if(!isset($_GET['url'])){
 		echo "gtfo";
 		exit;
 		die();
 	}
 
-	if(!isset($_SESSION['nonce']) || !isset($_SESSION['repo']) || $_SESSION['nonce'] != $_GET['nonce']){
+	if(!isset($_SESSION['repo'])){
 		echo "gtfo";
 		exit;
 		die();
