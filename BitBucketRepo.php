@@ -248,7 +248,7 @@ class BitBucketRepo{
             }
         }
     }
-    private function fixRelatives($text){
+    public function fixRelatives($text){
         // Find all relative URLs
         $patterns = ['/\b\s*((?:src|href)\s*=\s*(["\']))(\s*((?!#|\?|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\'"]+?.*?[^+\.]+?)\2)/i', '/\b\s*(url\s*\(\s*(["\']?)\s*)(((?!#|\?|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\'"]+?.*?[^+\.]+?)\s*\2\))/i', '/@(import\s*(["\']))(\s*((?!#|\?|https:\/\/|http:\/\/|\/\/|www\.)\s*?[^+\'"]+?.*?[^+\.]+?)\2)/i'];
 

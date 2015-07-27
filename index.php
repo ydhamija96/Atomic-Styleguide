@@ -103,7 +103,7 @@
                                                 }
                                                 elseif((strpos($repo->pwd(), '/templates') === 0)){ //If we're in the templates root dir.
                                                     foreach($repo->ls() as $item):
-                                                        if(!$repo->isDir($item)){                 //Shows only files
+                                                        if(!$repo->isDir($item) && end(explode('.', $item)) == 'html'){                 //Shows only .html files
                                                             $output = str_replace('.html', '', ucwords(str_replace('_', ' ', trim($item, '/'))));
                                                             ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= $output ?></a></li><?php
                                                         }

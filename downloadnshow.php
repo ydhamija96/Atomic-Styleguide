@@ -1,4 +1,5 @@
 <?php
+	require_once('BitBucketRepo.php');
 	session_start();
 	
 	if(!isset($_GET['url']) || !isset($_GET['nonce'])){
@@ -13,6 +14,8 @@
 		die();
 	}
 
+	$repo = $_SESSION['repo'];
+
 	$url = strrev($_GET['url']);
 
 	// Get the extension
@@ -25,7 +28,12 @@
 
     // Download the file
 	if(!file_exists($file)){
-    	file_put_contents($file, file_get_contents($url));
+		if($extension == '.css' || $extension == '.html' || $extension == '.js'){
+			file_put_contents($file, $repo->fixRelatives(file_get_contents($url)));
+		}
+		else{
+    		file_put_contents($file, file_get_contents($url));
+    	}
     }
 
     header('Location: '.$file);
