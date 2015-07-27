@@ -459,7 +459,7 @@
                         });
                         var newCount = count + 1;
                         if(newCount < paths.length){
-                            buildHTML(newCount+1);
+                            buildHTML(newCount);
                         }
                     }
                 });
@@ -481,7 +481,7 @@
                         });
                         var newCount = count + 1;
                         if(newCount < paths.length){
-                            buildCSS(newCount+1);
+                            buildCSS(newCount);
                         }
                     }
                 });
@@ -500,7 +500,7 @@
                         dom.html(returned.Output);
                         var newCount = count + 1;
                         if(newCount < paths.length){
-                            buildAssets(newCount+1);
+                            buildAssets(newCount);
                         }
                     }
                 });
