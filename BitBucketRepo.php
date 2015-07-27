@@ -341,7 +341,7 @@ class BitBucketRepo{
         $text = "p{} ".$text;
         $text = preg_replace('/([},][^@\w\.#]*?)(?!\.import)([\w\.#])/is', '${1} .import ${2}', $text);
         $text = preg_replace('/(@[^{]*?{[^@\w\.#]*?)(?!\.import)([\w\.#])/is', '${1} .import ${2}', $text);
-        $text = preg_replace('/(}[^@]*?{[^}]*?)\.import([^}]*)(?=})/is', '${1} ${2}', $text);
+        $text = preg_replace('/(}[^{]*?{[^}]*?)\.import([^}]*)(?=})/is', '${1} ${2}', $text);
         $this->cd($old);
         return substr($text, 4);
     }
