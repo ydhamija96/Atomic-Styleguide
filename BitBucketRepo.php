@@ -9,9 +9,9 @@ class BitBucketRepo{
     private $allMainCSS = 0;
     private $allFixedCSS = 0;
     private $nonce;
-    function __construct($url, $our){
+    function __construct($url, $ourSubUrl){
         $this->parentURL = $url;
-        $this->ourUrl = $our;
+        $this->ourUrl = $ourSubUrl;
         $this->directoryListing = $this->getAllContents($this->parentURL, $this->directoryListing);
         $this->mainCSS = 0;
         $this->fixedCSS = 0;

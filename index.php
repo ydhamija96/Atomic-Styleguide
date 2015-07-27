@@ -19,7 +19,7 @@
             $repo = $_SESSION['repo'];
         }
         else{
-            $repo = new BitBucketRepo('https://bitbucket.org/api/1.0/repositories/bluefountainmedia/nyu/raw/development/', '/');
+            $repo = new BitBucketRepo('https://bitbucket.org/api/1.0/repositories/bluefountainmedia/nyu/raw/development/', '');
             $_SESSION['repo'] = $repo;
         }
 
