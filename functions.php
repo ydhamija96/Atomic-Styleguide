@@ -10,7 +10,19 @@
 			echo json_encode(array('Input' => $_POST['input'], 'Output' => htmlspecialchars($repo->contents($_POST['path']))));
 		}
 		if(isset($_POST['action']) && isset($_POST['path']) && $_POST['action'] == 'relevantAssets'){
-			echo json_encode(array('Input' => $_POST['input'], 'Output' => $repo->relevantDownloads($_POST['path'])));
+			if(isset($_POST['html'])){
+				$html = $_POST['html'];
+			}
+			else{
+				$html = null;
+			}
+			if(isset($_POST['css'])){
+				$css = $_POST['css'];
+			}
+			else{
+				$css = null;
+			}
+			echo json_encode(array('Input' => $_POST['input'], 'Output' => $repo->relevantDownloads($_POST['path'], $html, $css)));
 		}
 	}
 ?>

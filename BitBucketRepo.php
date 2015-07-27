@@ -528,7 +528,7 @@ class BitBucketRepo{
         $this->cd($old);
         return $assets;
     }
-    public function relevantDownloads($item){
+    public function relevantDownloads($item, $givenhtml = null, $givencss = null){
         $result = '';
 
         // Output the root css and js files:
@@ -547,8 +547,18 @@ class BitBucketRepo{
         $result .= '<a href="'.$this->link($item).'" download="'.$item.'">'.$item.'</a><br />';
 
         // Output any assets:
-        $html = $this->contents($item);
-        $css = $this->relevantCSS($item);
+        if($givenhtml){
+            $html = $givenhtml;
+        }
+        else{
+            $html = $this->contents($item);
+        }
+        if($givencss){
+            $css = $givencss;
+        }
+        else{
+            $css = $this->relevantCSS($item);
+        }
         $oldlocation = $this->pwd();
         $this->cd('/');
         $assets = $this->findassets($this->contents('/atomicstyleguide-autoload.html').'|'.$html.'|'.$css);

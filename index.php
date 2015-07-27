@@ -482,19 +482,20 @@
                             dom.each(function(i, block) {
                                 hljs.highlightBlock(block);
                             });
-                        }
-                    });
-                    $.ajax({ url: 'functions.php',
-                        data: {
-                            action: 'relevantAssets',
-                            input: i,
-                            path: paths[i-1]
-                        },
-                        type: 'post',
-                        success: function(output){
-                            var returned = jQuery.parseJSON(output);
-                            var dom = $('#assetsCode'+returned.Input);
-                            dom.html(returned.Output);
+                            $.ajax({ url: 'functions.php',
+                                data: {
+                                    action: 'relevantAssets',
+                                    input: returned.Input,
+                                    css: returned.Output,
+                                    path: paths[returned.Input-1]
+                                },
+                                type: 'post',
+                                success: function(output){
+                                    var returned = jQuery.parseJSON(output);
+                                    var dom = $('#assetsCode'+returned.Input);
+                                    dom.html(returned.Output);
+                                }
+                            });
                         }
                     });
                 }
