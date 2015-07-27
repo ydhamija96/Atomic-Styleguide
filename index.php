@@ -209,7 +209,7 @@
                     $repo->cd('/');
                     $files = array();
                     foreach($repo->ls(true, true) as $path){
-                        if(explode('/', $path)[0] == 'components' || explode('/', $path)[0] == 'templates'){
+                        if((explode('/', $path)[0] == 'components' || explode('/', $path)[0] == 'templates') && end(explode('.', $path)) == 'html'){
                             $files[] = $path;
                         }
                     }
