@@ -11,7 +11,7 @@
 		}
 		if(isset($_POST['action']) && isset($_POST['path']) && $_POST['action'] == 'relevantAssets'){
 			if(isset($_POST['html'])){
-				$html = $_POST['html'];
+				$html = htmlspecialchars_decode($_POST['html']);
 			}
 			else{
 				$html = null;

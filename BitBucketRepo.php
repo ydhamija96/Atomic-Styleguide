@@ -514,12 +514,8 @@ class BitBucketRepo{
         $matches = array_unique($matches);
 
         foreach($matches as $asset){
-            $temp = $asset;
-            $temp = explode('.', $temp);
-            array_pop($temp);
-            $name = implode('.', $temp);
             foreach($this->ls(true, true) as $item){
-                if(strpos(trim($item, '/'), trim($name, '/')) !== false){
+                if(strpos($item, trim($asset, "&quot;")) !== false){
                     $assets[] = $item;
                 }
             }
