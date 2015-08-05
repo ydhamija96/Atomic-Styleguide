@@ -63,7 +63,7 @@
 </head>
 <?php if(isset($_GET['fullscreen']) && isset($_GET['path']) && $_GET['fullscreen'] == 'true') : ?>
     <body class="import">
-    <?= $repo->fixedcontents($_GET['path']) ?>
+    <?= $repo->remove_relative_css_js_links($repo->fixedcontents($_GET['path'])) ?>
 <?php else: ?>
     <body id="atomic-styleguide-body">
         <nav class="navbar navbar-default navbar-fixed-top">
