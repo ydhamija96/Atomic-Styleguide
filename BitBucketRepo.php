@@ -208,8 +208,8 @@ class BitBucketRepo{
     }
     public function remove_relative_css_js_links($text){
         $patterns = [
-            '/<\s*?link.*?href\s*?=\s*?[\'"]\s*?\/downloadnshow.php?url=ssc\..*?[\'"].*?>/i',
-            '/<\s*?script.*?src\s*?=\s*?[\'"]\s*?\/downloadnshow.php?url=sj\..*?[\'"].*?>.*?<\/script>/i'
+            '/<\s*?link[^<>]*?href\s*?=\s*?[\'"]\s*?\/downloadnshow\.php\?url=ssc\.[^<>]*?[\'"][^<>]*?>/i',
+            '/<\s*?script[^<>]*?src\s*?=\s*?[\'"]\s*?\/downloadnshow\.php\?url=sj\.[^<>]*?[\'"][^<>]*?>.*?<\/script>/i'
         ];
         $text = preg_replace($patterns, '', $text);
         return $text;
