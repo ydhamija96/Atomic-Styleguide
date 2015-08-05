@@ -135,16 +135,16 @@ class BitBucketRepo{
         $stamp = $date->getTimestamp();
         $rootname = "download_".$stamp;
         mkdir($rootname);
-        
+
         // Get name of file to be downloaded:
         $filename = explode('/', $item);
         $filename = end(array_values($filename));
-        
+
         // Create a directory and put the actual item in it:
         $foldername = substr($filename, 0, -5);    // Takes out the .html
         mkdir($rootname.'/'.$foldername);
         $this->file_force_contents($rootname.'/'.$foldername.'/'.$item, $this->contents($item));
-        
+
         // Put root .css and .js in it:
         $oldlocation = $this->pwd();
         $this->cd('/');
@@ -156,7 +156,7 @@ class BitBucketRepo{
             }
         }
         $this->cd($oldlocation);
-        
+
         // Copy any assets:
         $oldlocation = $this->pwd();
         $this->cd($item);
@@ -170,7 +170,7 @@ class BitBucketRepo{
         }
         $this->cd($old);
         $this->cd($oldlocation);
-        
+
         return $rootname;
     }
     private function file_force_contents($dir, $contents){
@@ -189,10 +189,10 @@ class BitBucketRepo{
         // Find out what to name directory:
         $foldername = explode('/', rtrim($folderToGet, '/'));
         $foldername = end(array_values($foldername));
-        
+
         // Create directory:
         mkdir($whereToPutIt.'/'.$foldername);
-        
+
         // Copy everything:
         $oldlocation = $this->pwd();
         $this->cd($folderToGet);
@@ -205,6 +205,14 @@ class BitBucketRepo{
             }
         }
         $this->cd($oldlocation);
+    }
+    public function remove_relative_css_js_links($text){
+        $patterns = [
+            '/<\s*?link.*?href\s*?=\s*?[\'"]\s*?(?!#|\?|https:\/\/|http:\/\/|\/\/|www\.)\.css\s*?[\'"].*?>/i',
+            '/<\s*?script.*?src\s*?=\s*?[\'"]\s*?(?!#|\?|https:\/\/|http:\/\/|\/\/|www\.)\.js\s*?[\'"].*?>.*?<\/script>/i'
+        ];
+        $text = preg_replace($patterns, '', $text);
+        return $text;
     }
     public function getDownload($item){
         $folder = $this->copyToServer($item);
@@ -288,7 +296,7 @@ class BitBucketRepo{
         foreach($matches as $match){
             $text = str_replace($match, $this->ourUrl.'/downloadnshow.php?url='.strrev($this->link($match)), $text);   // Reversing string so that similar matches don't trigger multiple replacements
         }
-        
+
         return $text;
     }
     private function cleanResources(){

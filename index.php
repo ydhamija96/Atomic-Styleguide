@@ -285,7 +285,7 @@
                                                     <p id="assetsCode<?= $counter ?>"><i class="fa fa-cog fa-3x fa-spin"></i> <script>document.write(loadingText[Math.floor(Math.random()*loadingText.length)]);</script></p>
                                                 </div>
                                             </div>
-                                            <div class="import"><?php echo $repo->fixedcontents($item); ?></div>
+                                            <div class="import"><?php echo $repo->remove_relative_css_js_links($repo->fixedcontents($item)); ?></div>
                                         </div>
                                         <?php
                                     echo '</div>';
@@ -423,7 +423,7 @@
                                         <p id="assetsCode1"><i class="fa fa-cog fa-3x fa-spin"></i> <script>document.write(loadingText[Math.floor(Math.random()*loadingText.length)]);</script></p>
                                     </div>
                                 </div>
-                                <div class="import"><?php echo $repo->fixedcontents($path); ?></div>
+                                <div class="import"><?php echo $repo->remove_relative_css_js_links($repo->fixedcontents($path)); ?></div>
                             </div>
                         </div>
                         <?php
