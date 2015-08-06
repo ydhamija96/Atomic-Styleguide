@@ -340,12 +340,9 @@
                                                         If you'd like to have your CSS load in a specific order, you have two options:
                                                         <ul>
                                                             <li>Put it all in one file in the root.</li>
-                                                            <li>Put a single CSS file in the root that imports other CSS files from subdirectories in the 
+                                                            <li>Put a single CSS file in the root that imports other CSS files from subdirectories in the
                                                             preferred order (via <span>@import</span>).</li>
                                                         </ul>
-                                                    </li>
-                                                    <li>
-                                                        Do not leave a <span>&lt;link rel="stylesheet" type="text/css" href="[cssFile].css"&gt;</span> in your HTML code.
                                                     </li>
                                                 </ul>
                                             </li>
