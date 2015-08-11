@@ -40,7 +40,7 @@ body > #content > .singleElement > .element:not(.import){
     width:80%;
     min-height:300px;
 }
-body > #content > .singleElement > .element > .import:not(.import){
+body > #content > .singleElement > .element > .import{
     overflow:hidden;
     width:100%;
     margin-bottom:5px;
