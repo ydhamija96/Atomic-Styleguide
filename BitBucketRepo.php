@@ -9,7 +9,7 @@ class BitBucketRepo{
     private $allMainCSS = 0;
     private $allFixedCSS = 0;
     private $nonce;
-    function __construct($url, $ourSubUrl){
+    function __construct($url, $ourSubUrl=''){
         $this->parentURL = $url;
         $this->ourUrl = $ourSubUrl;
         $this->directoryListing = $this->getAllContents($this->parentURL, $this->directoryListing);
@@ -207,9 +207,11 @@ class BitBucketRepo{
         $this->cd($oldlocation);
     }
     public function remove_relative_css_js_links($text){
+        $our = preg_quote(trim($this->ourUrl, '/'), '/');
+        $our = '\/*?'.$our.'\/*?';
         $patterns = [
-            '/<\s*?link[^<>]*?href\s*?=\s*?[\'"]\s*?\/downloadnshow\.php\?url=ssc\.[^<>]*?[\'"][^<>]*?>/i',
-            '/<\s*?script[^<>]*?src\s*?=\s*?[\'"]\s*?\/downloadnshow\.php\?url=sj\.[^<>]*?[\'"][^<>]*?>.*?<\/script>/i'
+            '/<\s*?link[^<>]*?href\s*?=\s*?[\'"]\s*?'.$our.'downloadnshow\.php\?url=ssc\.[^<>]*?[\'"][^<>]*?>/i',
+            '/<\s*?script[^<>]*?src\s*?=\s*?[\'"]\s*?'.$our.'downloadnshow\.php\?url=sj\.[^<>]*?[\'"][^<>]*?>.*?<\/script>/i'
         ];
         $text = preg_replace($patterns, '', $text);
         return $text;
@@ -353,7 +355,11 @@ class BitBucketRepo{
         $text = "p{} ".$text;
         $text = preg_replace('/([},][^@\w\.#]*?)(?!\.import)([\w\.#])/is', '${1} .import ${2}', $text);
         $text = preg_replace('/(@[^{]*?{[^@\w\.#]*?)(?!\.import)([\w\.#])/is', '${1} .import ${2}', $text);
-        $text = preg_replace('/(}[^{]*?{[^}]*?)\.import([^}]*)(?=})/is', '${1} ${2}', $text);
+        //// Removed because it broke the previous regex. I don't remember why it was here.
+        //$text = preg_replace('/(}[^{]*?{[^}]*?)\.import([^}]*)(?=})/is', '${1} ${2}', $text);
+        while(preg_match('/\.import([^{]*?\;)/is', $text)){
+            $text = preg_replace('/\.import([^{]*?\;)/is', '${1}', $text);
+        }
         $this->cd($old);
         return substr($text, 4);
     }
