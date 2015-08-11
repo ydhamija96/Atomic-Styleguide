@@ -1,9 +1,9 @@
 /* Demo class is a class used only by the repository style guide, it's intended to set styles for the repository */
-.demo_class {
+.demo_class:not(.import) {
     color: #6d6d6d;
     font-family: Arial;
 }
-.demo_class .palette, .demo_class .palette_lte {
+.demo_class .palette:not(.import), .demo_class .palette_lte:not(.import) {
     width: 125px;
     height: 125px;
     display: inline-block;

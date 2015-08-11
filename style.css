@@ -1,4 +1,4 @@
-#atomic-styleguide-body{
+#atomic-styleguide-body:not(.import){
     background: #CCCCCC;
 }
 body{
@@ -6,14 +6,14 @@ body{
 	border:0;
 	padding:0;
 }
-body > #content > .singleElement > .options{
+body > #content > .singleElement > .options:not(.import){
     display:inline-block;
     float:left;
     width:20%;
     min-width:165px;
     margin-bottom:20px;
 }
-body > #content > .options{
+body > #content > .options:not(.import){
     margin-bottom:20px;
     height:120px;
     padding:20px;
@@ -22,34 +22,34 @@ body > #content > .options{
     -moz-border-radius: 5px;
     border-radius: 5px;
 }
-body > #content > .singleElement > .options > form{
+body > #content > .singleElement > .options > form:not(.import){
     width:100%;
 }
-body > #content > .singleElement > .options > .btn, body > #content > .singleElement > .options > form > .btn{
+body > #content > .singleElement > .options > .btn:not(.import), body > #content > .singleElement > .options > form > .btn:not(.import){
     background: transparent;
     font-size:1.1em;
     width:100%;
     text-align:left;
 }
-body > #content > .singleElement > .options > form > .btn{
+body > #content > .singleElement > .options > form > .btn:not(.import){
     font-style:italic;
     font-weight:bold;
 }
-body > #content > .singleElement > .element{
+body > #content > .singleElement > .element:not(.import){
     display:inline-block;
     width:80%;
     min-height:300px;
 }
-body > #content > .singleElement > .element > .import{
+body > #content > .singleElement > .element > .import:not(.import){
     overflow:hidden;
     width:100%;
     margin-bottom:5px;
 }
-body > #content > .singleElement > .options > form, body > #content > .options > form{
+body > #content > .singleElement > .options > form:not(.import), body > #content > .options > form:not(.import){
     float:left;
     margin-right:4px;
 }
-body > #content > .singleElement{
+body > #content > .singleElement:not(.import){
     margin-bottom:25px;
     padding:20px;
     background:white;
@@ -57,19 +57,19 @@ body > #content > .singleElement{
     -moz-border-radius: 5px;
     border-radius: 5px;
 }
-body > #content{
+body > #content:not(.import){
     width:100%;
     max-width:1170px;
     padding:15px;
     margin:auto;
     margin-top:75px;
 }
-body > #content > .options > form > .btn{
+body > #content > .options > form > .btn:not(.import){
     background:white;
     font-style:italic;
     font-weight:bold;
 }
-body > #content > #homeContent{
+body > #content > #homeContent:not(.import){
     max-width:1170px;
     margin:auto;
     padding:20px;
@@ -78,22 +78,22 @@ body > #content > #homeContent{
     background:white;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
-    border-radius: 5px;  
+    border-radius: 5px;
 }
-body > #content > .element{
+body > #content > .element:not(.import){
     padding:20px;
     background:white;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
-    border-radius: 5px;    
+    border-radius: 5px;
 }
-body > #content > .singleElement > .element > .collapse pre{
+body > #content > .singleElement > .element > .collapse pre:not(.import){
     font-size:11px;
 }
-body > #content > .singleElement > .element > .collapsing pre{
+body > #content > .singleElement > .element > .collapsing pre:not(.import){
     font-size:11px;
 }
-#homeContent li > span{
+#homeContent li > span:not(.import){
     font-family: monospace;
     background:#EEEEEE;
     padding-left:5px;
@@ -101,6 +101,6 @@ body > #content > .singleElement > .element > .collapsing pre{
     color:black;
     border:1px dotted #996699;
 }
-.atomicstyleguide-logo{
+.atomicstyleguide-logo:not(.import){
     color: #996699;
 }
