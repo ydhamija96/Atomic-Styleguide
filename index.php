@@ -7,12 +7,14 @@
 
 <head>
     <title>Atomic Styleguide</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <?php if(!isset($_GET['fullscreen']) || $_GET['fullscreen'] != 'true'): ?>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/default.min.css"><!-- Source for this awesome tool: https://highlightjs.org/. Go nuts. -->
+        <link rel="stylesheet" href="https://highlightjs.org/static/styles/github.css">
+    <?php endif; ?>
     <link rel="stylesheet" type="text/css" href="style.css">
     <link rel="stylesheet" type="text/css" href="demoClass.css">
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/styles/default.min.css"><!-- No idea if licensing allows this. -->
-    <link rel="stylesheet" href="https://highlightjs.org/static/styles/github.css"><!-- No idea if licensing allows this. -->
     <?php
         // Start repo:
         if(isset($_SESSION['repo'])){
@@ -92,13 +94,13 @@
                             // Display all directories in bitbucket root:
                             $current = $repo->pwd();
                             $repo->cd('/');
-                            foreach($repo->ls(false) as $dir): 
+                            foreach($repo->ls(false) as $dir):
                                 // Ignore everything that's not components or templates
                                 if(strtolower($dir) == "components/" || strtolower($dir) == "templates/"): ?>
                                     <li class="dropdown">
                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?= ucfirst(rtrim($dir, '/')) ?><span class="caret"></span></a>
                                         <ul class="dropdown-menu">
-                                            <?php 
+                                            <?php
 
                                                 // Display contents of each directory:
                                                 $repo->cd($dir);
@@ -110,8 +112,8 @@
                                                         foreach($repo->ls() as $file){
                                                             if(end(explode('.', $file)) == 'html'){
                                                                 $output = str_replace('.html', '', ucwords(str_replace('_', ' ', trim($item, '/'))));
-                                                                ?><li><a href="?path=<?= urlencode($old.'/'.$item) ?>"><?= $output ?></a></li><?php   
-                                                                break;                                                             
+                                                                ?><li><a href="?path=<?= urlencode($old.'/'.$item) ?>"><?= $output ?></a></li><?php
+                                                                break;
                                                             }
                                                         }
                                                         $repo->cd($old);
@@ -123,22 +125,22 @@
                                                             $output = str_replace('.html', '', ucwords(str_replace('_', ' ', trim($item, '/'))));
                                                             ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= $output ?></a></li><?php
                                                         }
-                                                    endforeach;                            
+                                                    endforeach;
                                                 }
                                                 else{
                                                     foreach($repo->ls() as $item):
                                                         $output = str_replace('.html', '', ucwords(str_replace('_', ' ', trim($item, '/'))));
                                                        ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= $output ?></a></li><?php
-                                                    endforeach;                            
+                                                    endforeach;
                                                 }
                                                 $repo->cd('..');
                                             ?>
                                         </ul>
                                     </li>
-                                    <?php 
+                                    <?php
                                 endif;
                             endforeach;
-                            $repo->cd($current); 
+                            $repo->cd($current);
                         ?>
                         <!--<?php
 
@@ -148,7 +150,7 @@
                                     <li class="dropdown">
                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?= ucfirst(rtrim($dir, '/')) ?><span class="caret"></span></a>
                                         <ul class="dropdown-menu">
-                                        <?php 
+                                        <?php
 
                                             // Display contents of directory:
                                             $repo->cd($dir);
@@ -159,7 +161,7 @@
                                         ?>
                                         </ul>
                                     </li>
-                                    <?php 
+                                    <?php
                                 endforeach;
                             }
                         ?>-->
@@ -185,7 +187,7 @@
         </nav>
         <div id="content" class="demo_class">
             <?php if(isset($_GET['search'])): ?>
-                <?php 
+                <?php
                     $search = htmlspecialchars($_GET['search']);
                 ?>
                 <div class="singleElement">
@@ -303,13 +305,13 @@
                         elseif($repo->pwd() == '/'){   // If at document root.
                             ?>
                                 <div id="homeContent">
-                                    <i style="margin-top:10px; border-color:#996699;" id="logo" class="atomicstyleguide-logo fa-flip-vertical pull-left fa fa-simplybuilt fa-5x fa-border"></i> 
+                                    <i style="margin-top:10px; border-color:#996699;" id="logo" class="atomicstyleguide-logo fa-flip-vertical pull-left fa fa-simplybuilt fa-5x fa-border"></i>
                                     <h2>Welcome to the...</h2>
                                     <h1>Atomic Style Guide!</h1><br />
                                     <h3>What it does:</h3>
                                     <p>
-                                        In atomic designs (designs that are broken down into individual components/templates), 
-                                        this is the style guide. It will display each component, show its HTML 
+                                        In atomic designs (designs that are broken down into individual components/templates),
+                                        this is the style guide. It will display each component, show its HTML
                                         and CSS code, and allow it (and each of its dependencies) to be downloaded at the click of
                                         a button.<br /><br />
                                         Each element is directly accessed from where it is stored, so there is no updating
@@ -323,7 +325,7 @@
                                             <li>
                                                 <strong>HTML:</strong>
                                                 <ul>
-                                                    <li>Store your components' HTML files like this: <span>/components/[component-subgroup]/[individual-component].html</span>.</li> 
+                                                    <li>Store your components' HTML files like this: <span>/components/[component-subgroup]/[individual-component].html</span>.</li>
                                                     <li>Store your templates' HTML files like this: <span>/templates/[individual-template].html</span>.</li>
                                                 </ul>
                                             </li>
@@ -363,7 +365,7 @@
                                         </ul>
                                     </p>
                                 </div>
-                            <?php                    
+                            <?php
                         }
                         else{   // If in some other root dir.
                             echo "<pre>" . $repo->pwd() . ":<br>";
@@ -433,7 +435,7 @@
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
         <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
         <script src="http://getbootstrap.com/assets/js/ie10-viewport-bug-workaround.js"></script>
-        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script><!-- No idea if licensing allows this. -->
+        <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.6/highlight.min.js"></script>
         <script>
             var search_expanded = false;
             $('#atomic-styleguide-search-button').on("click",function(){
