@@ -350,7 +350,7 @@ class BitBucketRepo{
     public function fixCSS($text){
         $old = $this->pwd();
         $this->cd('/');
-        $text = preg_replace('/\/\*.*?\*\//','', $text);
+        $text = preg_replace('/\/\*.*?\*\//is','', $text);
         $text = $this->fixRelatives($text);
         $text = "p{} ".$text;
         $text = preg_replace('/([},][^@\w\.#]*?)(?!\.import)([\w\.#])/is', '${1} .import ${2}', $text);
@@ -444,7 +444,7 @@ class BitBucketRepo{
         return $mediaBlocks;
     }
     private function filtercss($type, $names){
-        $text = preg_replace('/\/\*.*?\*\//','', $this->getcss(false, true));
+        $text = preg_replace('/\/\*.*?\*\//is','', $this->getcss(false, true));
         $mediablocks = $this->parse_css_media_queries($text);
         $namesregex = '(?:';
         if(!empty($names)){
