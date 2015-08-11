@@ -95,7 +95,7 @@
                             $current = $repo->pwd();
                             $repo->cd('/');
                             foreach($repo->ls(false) as $dir):
-                                // Ignore everything that's not components or templates
+                                // Uncomment next line (and the relevant 'endif;' below) to ignore everything that's not components or templates
                                 if(strtolower($dir) == "components/" || strtolower($dir) == "templates/"): ?>
                                     <li class="dropdown">
                                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?= ucfirst(rtrim($dir, '/')) ?><span class="caret"></span></a>
@@ -142,45 +142,44 @@
                             endforeach;
                             $repo->cd($current);
                         ?>
-                        <!--<?php
+                        <!-- Uncomment to display all directories in current repo location if not root:
+                            <?php
+                                if($repo->pwd() != '/'){
+                                    foreach($repo->ls(false) as $dir): ?>
+                                        <li class="dropdown">
+                                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?= ucfirst(rtrim($dir, '/')) ?><span class="caret"></span></a>
+                                            <ul class="dropdown-menu">
+                                            <?php
 
-                            // Display all directories in the current repo location, if not root:
-                            if($repo->pwd() != '/'){
-                                foreach($repo->ls(false) as $dir): ?>
-                                    <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><?= ucfirst(rtrim($dir, '/')) ?><span class="caret"></span></a>
-                                        <ul class="dropdown-menu">
+                                                // Display contents of directory:
+                                                $repo->cd($dir);
+                                                foreach($repo->ls() as $item):
+                                                    ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
+                                                endforeach;
+                                                $repo->cd('..');
+                                            ?>
+                                            </ul>
+                                        </li>
                                         <?php
-
-                                            // Display contents of directory:
-                                            $repo->cd($dir);
-                                            foreach($repo->ls() as $item):
-                                                ?><li><a href="?path=<?= urlencode($repo->pwd().'/'.$item) ?>"><?= ucfirst($item) ?></a></li><?php
-                                            endforeach;
-                                            $repo->cd('..');
-                                        ?>
-                                        </ul>
-                                    </li>
-                                    <?php
-                                endforeach;
-                            }
-                        ?>-->
+                                    endforeach;
+                                }
+                            ?>
+                        -->
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                         <?php
-
                             // Get current location human-readable string:
                             $output = str_replace('.html', '', ucwords(str_replace('/', ' > ', str_replace('_', ' ', trim((isset($path))?$path:'', '/')))));
                         ?>
                         <p class="navbar-text"><strong><?= $output ?></strong></p>
-                        <!--<?php
-
-                            // A 'Go Up' button:
-                            $curlink = $repo->pwd();
-                            $repo->cd('..');
-                            ?><li><a href="?path=<?= $repo->currentDir() ?>">Go Up <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span></a></li><?php
-                            $repo->cd($curlink);
-                        ?>-->
+                        <!--Uncomment to have a 'Go Up' button for navigation (useful if viewing other dirs than 'components' and 'templates' is uncommented above)
+                            <?php
+                                $curlink = $repo->pwd();
+                                $repo->cd('..');
+                                ?><li><a href="?path=<?= $repo->currentDir() ?>">Go Up <span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span></a></li><?php
+                                $repo->cd($curlink);
+                            ?>
+                        -->
                     </ul>
                 </div>
             </div>
@@ -234,67 +233,7 @@
             <?php else: ?>
                 <?php
                     if(!$singleFile){   // If the URL does not specify a single file in the repo
-                        if(strpos($repo->pwd(), '/components') === 0){  // If in components root dir
-                            $counter = 0;
-
-                            // Display all .html files:
-                            foreach($repo->ls() as $item){
-                                if(!$repo->isDir($item) && end(explode('.', $item)) == 'html'){
-                                    ++$counter;
-                                    echo '<div class="singleElement">'; ?>
-                                        <div class="options">
-                                            <?php
-                                                $output = substr($item, 0, -5);     // Takes out the .html
-                                                $output = ucwords(str_replace("_", ' ', $output));
-                                            ?>
-                                            <h4><?= $output ?></h4>
-                                            <form action="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]&download=TRUE" ?>" method="POST">
-                                                <input type="text" name="downloadpath" style="display:none;" value="<?= $repo->pwd().'/'.$item ?>" />
-                                                <input type="submit" class="btn" value="Download Files .zip"></input>
-                                            </form>
-                                            <a href="?path=<?=$repo->pwd().'/'.$item?>&fullscreen=true" target="_blank" class="btn" style="color:inherit;" id="atomic-styleguide-fullscreen">
-                                                <i class="fa fa-arrows-alt fa-fw"></i> Fullscreen
-                                            </a>
-                                            <button class="btn" type="button" data-toggle="collapse" data-target="#html<?= $counter ?>" aria-expanded="false" aria-controls="html<?= $counter ?>">
-                                                <i class="fa fa-html5 fa-fw"></i> See the HTML
-                                            </button>
-                                            <button class="btn" type="button" data-toggle="collapse" data-target="#css<?= $counter ?>" aria-expanded="false" aria-controls="css<?= $counter ?>">
-                                                <i class="fa fa-css3 fa-fw"></i> See the CSS
-                                            </button>
-                                            <button class="btn" type="button" data-toggle="collapse" data-target="#assets<?= $counter ?>" aria-expanded="false" aria-controls="assets<?= $counter ?>">
-                                                <i class="fa fa-download fa-fw"></i> Download Files
-                                            </button>
-                                        </div>
-                                        <div class="element">
-                                            <script>
-                                                paths.push("<?= $repo->pwd().'/'.$item ?>");
-                                            </script>
-                                            <div class="collapse" id="html<?= $counter ?>">
-                                                <div class="well">
-                                                    <h5>HTML:</h5>
-                                                    <pre><code id="htmlCode<?= $counter ?>" class='html'><i class="fa fa-cog fa-3x fa-spin"></i> <script>document.write(loadingText[Math.floor(Math.random()*loadingText.length)]);</script></code></pre>
-                                                </div>
-                                            </div>
-                                            <div class="collapse" id="css<?= $counter ?>">
-                                                <div class="well">
-                                                    <h5>CSS:</h5>
-                                                    <pre><code id='cssCode<?= $counter ?>' class='css'><i class="fa fa-cog fa-3x fa-spin"></i> <script>document.write(loadingText[Math.floor(Math.random()*loadingText.length)]);</script></code></pre>
-                                                </div>
-                                            </div>
-                                            <div class="collapse" id="assets<?= $counter ?>">
-                                                <div class="well">
-                                                    <h5>Assets:</h5>
-                                                    <p id="assetsCode<?= $counter ?>"><i class="fa fa-cog fa-3x fa-spin"></i> <script>document.write(loadingText[Math.floor(Math.random()*loadingText.length)]);</script></p>
-                                                </div>
-                                            </div>
-                                            <div class="import"><?php echo $repo->remove_relative_css_js_links($repo->fixedcontents($item)); ?></div>
-                                        </div>
-                                        <?php
-                                    echo '</div>';
-                                }
-                            }
-                        }
-                        elseif(strpos($repo->pwd(), '/templates') === 0){   // If in templatesroot dir.
+                        if(strpos($repo->pwd(), '/templates') === 0){   // If in templates root dir.
 
                             // Note: User should never arrive here because templates menu
                                 // only shows single templates files. $singleFile would be true.
@@ -367,10 +306,65 @@
                                 </div>
                             <?php
                         }
-                        else{   // If in some other root dir.
-                            echo "<pre>" . $repo->pwd() . ":<br>";
-                            print_r($repo->ls(true, true));
-                            echo "</pre>";
+                        else{  // If in some other root dir
+                            $counter = 0;
+
+                            // Display all .html files:
+                            foreach($repo->ls() as $item){
+                                if(!$repo->isDir($item) && end(explode('.', $item)) == 'html'){
+                                    ++$counter;
+                                    echo '<div class="singleElement">'; ?>
+                                        <div class="options">
+                                            <?php
+                                                $output = substr($item, 0, -5);     // Takes out the .html
+                                                $output = ucwords(str_replace("_", ' ', $output));
+                                            ?>
+                                            <h4><?= $output ?></h4>
+                                            <form action="<?= "http://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]&download=TRUE" ?>" method="POST">
+                                                <input type="text" name="downloadpath" style="display:none;" value="<?= $repo->pwd().'/'.$item ?>" />
+                                                <input type="submit" class="btn" value="Download Files .zip"></input>
+                                            </form>
+                                            <a href="?path=<?=$repo->pwd().'/'.$item?>&fullscreen=true" target="_blank" class="btn" style="color:inherit;" id="atomic-styleguide-fullscreen">
+                                                <i class="fa fa-arrows-alt fa-fw"></i> Fullscreen
+                                            </a>
+                                            <button class="btn" type="button" data-toggle="collapse" data-target="#html<?= $counter ?>" aria-expanded="false" aria-controls="html<?= $counter ?>">
+                                                <i class="fa fa-html5 fa-fw"></i> See the HTML
+                                            </button>
+                                            <button class="btn" type="button" data-toggle="collapse" data-target="#css<?= $counter ?>" aria-expanded="false" aria-controls="css<?= $counter ?>">
+                                                <i class="fa fa-css3 fa-fw"></i> See the CSS
+                                            </button>
+                                            <button class="btn" type="button" data-toggle="collapse" data-target="#assets<?= $counter ?>" aria-expanded="false" aria-controls="assets<?= $counter ?>">
+                                                <i class="fa fa-download fa-fw"></i> Download Files
+                                            </button>
+                                        </div>
+                                        <div class="element">
+                                            <script>
+                                                paths.push("<?= $repo->pwd().'/'.$item ?>");
+                                            </script>
+                                            <div class="collapse" id="html<?= $counter ?>">
+                                                <div class="well">
+                                                    <h5>HTML:</h5>
+                                                    <pre><code id="htmlCode<?= $counter ?>" class='html'><i class="fa fa-cog fa-3x fa-spin"></i> <script>document.write(loadingText[Math.floor(Math.random()*loadingText.length)]);</script></code></pre>
+                                                </div>
+                                            </div>
+                                            <div class="collapse" id="css<?= $counter ?>">
+                                                <div class="well">
+                                                    <h5>CSS:</h5>
+                                                    <pre><code id='cssCode<?= $counter ?>' class='css'><i class="fa fa-cog fa-3x fa-spin"></i> <script>document.write(loadingText[Math.floor(Math.random()*loadingText.length)]);</script></code></pre>
+                                                </div>
+                                            </div>
+                                            <div class="collapse" id="assets<?= $counter ?>">
+                                                <div class="well">
+                                                    <h5>Assets:</h5>
+                                                    <p id="assetsCode<?= $counter ?>"><i class="fa fa-cog fa-3x fa-spin"></i> <script>document.write(loadingText[Math.floor(Math.random()*loadingText.length)]);</script></p>
+                                                </div>
+                                            </div>
+                                            <div class="import"><?php echo $repo->remove_relative_css_js_links($repo->fixedcontents($item)); ?></div>
+                                        </div>
+                                        <?php
+                                    echo '</div>';
+                                }
+                            }
                         }
                     }
                     else{   // If a single file is specified in the URL
