@@ -5,9 +5,11 @@ Also, this project was not deemed high priority. It was mostly done for fun. I w
 
 # Explanation:
 
-This is an automated styleguide generator for atomic web design. It takes a BitBucket repo containing individual compoenents and templates, and
-displays a nice website with each of its compoenents and templates in a nice organized fashion, providing the ability to review designs,
-copy/paste the individual code for components, as well download only required files (among other things). It has no special requirements other than that of a standard PHP server,
+This is an automated styleguide generator for atomic web design. It takes a BitBucket repo containing individual components and templates, and
+displays a nice website with each of its compoenents and templates in a nice organized fashion. It provides the ability to review designs,
+copy/paste the individual code for components, as well download only required files (among other things). 
+
+It has no special requirements other than that of a standard PHP server,
 not even a database. All that must be done is to set it up on a PHP server (can be done locally, you don't have to make a website out of it),
 set index.php to point to the right BitBucket repo, and you're golden.
 
@@ -16,9 +18,13 @@ set index.php to point to the right BitBucket repo, and you're golden.
 In most projects, design code resides in a repository with a file structure resembling something like this:
 
 main.css
+
 assets/
+
 templates/
+
 components/
+
 scripts.js
 
 If you want to display a component, you have to hunt it down in the file structure, fix its relative links by hand,
