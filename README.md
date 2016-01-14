@@ -3,6 +3,18 @@
 This documentation is incomplete (obviously). If necessary, I'll update it.
 Also, this project was not deemed high priority. It was mostly done for fun. I would not be surprised if there are bugs.
 
+# TL;DR (Too long; didn't read):
+
+This generates a complete, automated, always-up-to-date styleguide for developers and designers
+to use.
+
+The importance of a styleguide is to ensure consistent style of components in a single page, among multiple pages in the same
+website, and among multiple websites that are related.
+
+As an example, a university has a bunch of different schools. All of those schools have their own websites. All of those websites share
+a similar design. You bet the university has a styleguide to act as a guideline for these websites. This program will automatically generate
+that styleguide from a pre-existing repository. And, when an update is made to the design, the styleguide will reflect that <bold>instantly</bold>.
+
 # Explanation:
 
 This is an automated styleguide generator for atomic web design. It takes a BitBucket repo containing individual components and templates, and
